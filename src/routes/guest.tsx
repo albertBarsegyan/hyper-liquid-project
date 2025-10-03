@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
-import { LandingPage } from '@/pages';
+import LandingPage from '@/pages/landing';
 
 export const guestRoutes = createBrowserRouter([
   {

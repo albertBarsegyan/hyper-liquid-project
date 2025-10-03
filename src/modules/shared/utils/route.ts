@@ -4,6 +4,7 @@ export const innerRoutePath = {
   getVerification: () => '/verification',
   getStartPage: () => '/start-journey',
   getDashboard: () => '/dashboard',
+  getTransactionHistory: () => '/transactions',
   getAdditionalInfo: () => '/additional-info',
   getProfileSettings: () => '/profile-settings',
   getForgetPassword: () => '/forget-password',

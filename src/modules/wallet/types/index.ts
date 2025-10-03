@@ -1,4 +1,5 @@
 import type { AddEthereumChainParameter } from '@/types/etherium.ts';
+import type { BrowserProvider } from 'ethers';
 
 export interface WalletState {
   isConnected: boolean;
@@ -23,6 +24,7 @@ export interface WalletContextType extends WalletState {
   switchToHyperEVM: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   clearError: () => void;
+  getProvider: () => BrowserProvider | null;
 }
 
 export const HYPER_EVM_CONFIG: AddEthereumChainParameter = {

@@ -8,19 +8,23 @@ import {
 
 import { getWalletErrorMessage } from '@/modules/wallet/utils';
 
-// Helper to extract error code from ethers v6 wrapped errors
+type ErrorWithCode = { code: unknown; error?: unknown };
+
 const getErrorCode = (error: unknown): number | undefined => {
   if (typeof error === 'object' && error !== null) {
-    // Try to get code from nested error property (ethers v6 wrapping)
-    const innerError = (error as any).error;
-    if (innerError && typeof innerError === 'object' && 'code' in innerError) {
-      return typeof innerError.code === 'number' ? innerError.code : undefined;
+    const errObj = error as ErrorWithCode;
+
+    // Check nested error (ethers v6 wrapping)
+    if (errObj.error && typeof errObj.error === 'object') {
+      const inner = errObj.error as ErrorWithCode;
+      if (typeof inner.code === 'number') {
+        return inner.code;
+      }
     }
-    // Try to get code directly (non-wrapped error)
-    if ('code' in error) {
-      return typeof (error as any).code === 'number'
-        ? (error as any).code
-        : undefined;
+
+    // Check direct code
+    if (typeof errObj.code === 'number') {
+      return errObj.code;
     }
   }
   return undefined;
@@ -39,13 +43,13 @@ const defaultState = {
   error: null,
   isMetaMask: false,
   isCorrectNetwork: false,
+  getProvider: () => {},
 };
 
 const useWallet = (): WalletContextType => {
   const [state, setState] = useState<WalletState>(defaultState);
   const providerRef = useRef<BrowserProvider | null>(null);
 
-  // Get or create provider instance
   const getProvider = useCallback((): BrowserProvider | null => {
     if (!window.ethereum) return null;
 
@@ -352,6 +356,7 @@ const useWallet = (): WalletContextType => {
     disconnect,
     switchToHyperEVM,
     refreshBalance,
+    getProvider,
     clearError,
   };
 };

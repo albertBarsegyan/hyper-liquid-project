@@ -1,0 +1,24 @@
+/* Typewriter.module.css */
+.container {
+    display: inline-block;
+}
+
+.text {
+    /* IMPORTANT: display must allow width animation */
+    display: inline-block;
+    width: 0; /* start from zero */
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 0.15em solid currentColor; /* cursor uses text color */
+    will-change: width;
+}
+
+
+:global(@keyframes typing) {
+    from { width: 0; }
+    to   { width: 100%; }
+}
+:global(@keyframes blinkCaret) {
+    0%, 100% { border-color: transparent; }
+    50%      { border-color: currentColor; }
+}

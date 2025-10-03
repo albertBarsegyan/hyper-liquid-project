@@ -1,14 +1,36 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
-import DashboardPage from '../pages/dashboard.tsx';
+import AuthenticatedLayout from '../components/authenticated-layout';
+import DashboardPage from '../pages/dashboard';
+import TransactionHistoryPage from '../pages/transaction-history/index.tsx';
+import SendPage from '../pages/send/index.tsx';
+import ExplorePage from '../pages/explore/index.tsx';
 
 export const authenticatedRoutes = createBrowserRouter([
   {
-    path: innerRoutePath.getMain(),
-    element: <DashboardPage />,
-  },
-  {
-    path: innerRoutePath.getAll(),
-    element: <Navigate to={innerRoutePath.getMain()} />,
+    path: '/',
+    element: <AuthenticatedLayout />,
+    children: [
+      {
+        path: innerRoutePath.getMain(),
+        element: <DashboardPage />,
+      },
+      {
+        path: innerRoutePath.getTransactionHistory(),
+        element: <TransactionHistoryPage />,
+      },
+      {
+        path: '/send',
+        element: <SendPage />,
+      },
+      {
+        path: '/explore',
+        element: <ExplorePage />,
+      },
+      {
+        path: innerRoutePath.getAll(),
+        element: <Navigate to={innerRoutePath.getMain()} />,
+      },
+    ],
   },
 ]);
