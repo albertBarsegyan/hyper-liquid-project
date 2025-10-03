@@ -1,4 +1,5 @@
 import React from 'react';
+import { HYPER_EVM_CONFIG } from '@/modules/wallet';
 
 const About: React.FC = () => {
   return (
@@ -59,10 +60,12 @@ const About: React.FC = () => {
                 Network Specs
               </h4>
               <ul className="text-blue-700 space-y-1">
-                <li>• Chain ID: 999</li>
-                <li>• Currency: HYPE</li>
-                <li>• RPC: rpc.hyperliquid.xyz</li>
-                <li>• Explorer: hyperscan.com</li>
+                <li>• Chain ID: {HYPER_EVM_CONFIG.chainId}</li>
+                <li>• Currency: {HYPER_EVM_CONFIG.nativeCurrency.name}</li>
+                <li>• RPC: {HYPER_EVM_CONFIG.rpcUrls[0]}</li>
+                <li>
+                  • Explorer: {HYPER_EVM_CONFIG.blockExplorerUrls?.[0] ?? ''}
+                </li>
               </ul>
             </div>
           </div>
