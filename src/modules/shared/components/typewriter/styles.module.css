@@ -1,6 +1,7 @@
 /* Typewriter.module.css */
 .container {
     display: inline-block;
+    width: 100%;
 }
 
 .text {
@@ -11,6 +12,15 @@
     white-space: nowrap;
     border-right: 0.15em solid currentColor; /* cursor uses text color */
     will-change: width;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Responsive cursor size */
+@media (max-width: 640px) {
+    .text {
+        border-right-width: 0.1em;
+    }
 }
 
 

@@ -40,13 +40,13 @@ const ExplorePage: React.FC = () => {
   ];
 
   return (
-    <div className="container mx-auto px-6 py-8 min-h-full">
+    <div className="container-responsive py-responsive min-h-full">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#97fce4' }}>
+          <h1 className="text-responsive-3xl font-bold mb-2" style={{ color: '#97fce4' }}>
             Explore
           </h1>
-          <p style={{ color: '#97fce4', opacity: 0.8 }}>
+          <p className="text-responsive-base" style={{ color: '#97fce4', opacity: 0.8 }}>
             Discover the HyperEVM ecosystem and find new opportunities
           </p>
         </div>
@@ -56,8 +56,8 @@ const ExplorePage: React.FC = () => {
           className="mb-8"
           style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}
         >
-          <CardContent className="p-6">
-            <div className="flex space-x-4">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5"
@@ -66,7 +66,7 @@ const ExplorePage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Search tokens, contracts, or addresses..."
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg text-responsive-sm"
                   style={{
                     backgroundColor: '#0e1e27',
                     borderColor: '#97fce4',
@@ -75,6 +75,7 @@ const ExplorePage: React.FC = () => {
                 />
               </div>
               <Button
+                className="w-full sm:w-auto"
                 style={{
                   backgroundColor: '#97fce4',
                   color: '#0e1e27',
@@ -88,7 +89,7 @@ const ExplorePage: React.FC = () => {
         </Card>
 
         {/* Explore Categories */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid-responsive-4 gap-6">
           {exploreItems.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -129,10 +130,10 @@ const ExplorePage: React.FC = () => {
 
         {/* Trending Section */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6" style={{ color: '#97fce4' }}>
+          <h2 className="text-responsive-2xl font-bold mb-6" style={{ color: '#97fce4' }}>
             Trending
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid-responsive-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(item => (
               <Card
                 key={item}

@@ -3,21 +3,26 @@ import { WalletInfo } from '@/modules/wallet';
 
 const Home: React.FC = () => {
   return (
-    <div className="px-4 py-6 sm:px-0">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="container-responsive py-responsive">
+      <div className="grid-responsive-2 gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-responsive-2xl font-bold mb-4" style={{ color: '#97fce4' }}>
             HyperEVM Wallet Connection
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-responsive-base mb-6" style={{ color: '#97fce4', opacity: 0.8 }}>
             Connect your MetaMask wallet to interact with the HyperEVM network.
             This demo shows how to connect, switch networks, and display wallet
             information.
           </p>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Features</h3>
-            <ul className="space-y-2 text-gray-600">
+          <div 
+            className="p-responsive rounded-lg shadow"
+            style={{ backgroundColor: '#021e17', borderColor: '#97fce4', border: '1px solid' }}
+          >
+            <h3 className="text-responsive-lg font-semibold mb-4" style={{ color: '#97fce4' }}>
+              Features
+            </h3>
+            <ul className="space-y-2" style={{ color: '#97fce4', opacity: 0.8 }}>
               <li>• Connect to MetaMask wallet</li>
               <li>• Automatic HyperEVM network detection</li>
               <li>• Switch to HyperEVM network with one click</li>
@@ -31,11 +36,19 @@ const Home: React.FC = () => {
         <div>
           <WalletInfo />
 
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-blue-800 mb-2">
+          <div 
+            className="mt-6 p-4 rounded-lg"
+            style={{ 
+              backgroundColor: '#021e17', 
+              borderColor: '#97fce4', 
+              border: '1px solid',
+              opacity: 0.8
+            }}
+          >
+            <h3 className="text-responsive-lg font-semibold mb-2" style={{ color: '#97fce4' }}>
               HyperEVM Network Details
             </h3>
-            <div className="text-sm text-blue-700 space-y-1">
+            <div className="text-responsive-sm space-y-1" style={{ color: '#97fce4', opacity: 0.8 }}>
               <div>
                 <strong>Chain ID:</strong> 999
               </div>

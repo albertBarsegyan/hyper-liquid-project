@@ -120,17 +120,17 @@ const TokenPortfolio: React.FC = () => {
 
   if (!isConnected) {
     return (
-      <Card>
+      <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
         <CardHeader>
-          <CardTitle className="flex items-center">
+          <CardTitle className="flex items-center text-responsive-lg" style={{ color: '#97fce4' }}>
             <Coins className="mr-2 h-5 w-5" />
             Token Portfolio
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
+          <Alert style={{ backgroundColor: '#0e1e27', borderColor: '#97fce4' }}>
+            <AlertTriangle className="h-4 w-4" style={{ color: '#ff6b6b' }} />
+            <AlertDescription style={{ color: '#97fce4' }}>
               Please connect your wallet to view your token portfolio.
             </AlertDescription>
           </Alert>
@@ -140,14 +140,24 @@ const TokenPortfolio: React.FC = () => {
   }
 
   return (
-    <Card>
+    <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle className="flex items-center text-responsive-lg" style={{ color: '#97fce4' }}>
             <Coins className="mr-2 h-5 w-5" />
             Token Portfolio
           </CardTitle>
-          <Button onClick={fetchTokenBalances} disabled={loading} size="sm">
+          <Button 
+            onClick={fetchTokenBalances} 
+            disabled={loading} 
+            size="sm"
+            className="w-full sm:w-auto"
+            style={{
+              backgroundColor: '#97fce4',
+              color: '#0e1e27',
+              border: 'none'
+            }}
+          >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -184,51 +194,61 @@ const TokenPortfolio: React.FC = () => {
             {tokens.map((token, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-4"
+                style={{ borderColor: '#97fce4', opacity: 0.3 }}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#97fce4', opacity: 0.2 }}
+                  >
+                    <span className="text-sm font-medium" style={{ color: '#0e1e27' }}>
                       {token.symbol.slice(0, 2)}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium">{token.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-responsive-sm" style={{ color: '#97fce4' }}>
+                      {token.name}
+                    </p>
+                    <p className="text-responsive-xs" style={{ color: '#97fce4', opacity: 0.8 }}>
                       {token.symbol}
                     </p>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <p className="font-medium">
-                    {parseFloat(token.balanceFormatted).toFixed(6)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {token.symbol}
-                  </p>
-                </div>
+                <div className="flex items-center justify-between sm:justify-end gap-4">
+                  <div className="text-right">
+                    <p className="font-medium text-responsive-sm" style={{ color: '#97fce4' }}>
+                      {parseFloat(token.balanceFormatted).toFixed(6)}
+                    </p>
+                    <p className="text-responsive-xs" style={{ color: '#97fce4', opacity: 0.8 }}>
+                      {token.symbol}
+                    </p>
+                  </div>
 
-                <div className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(token.address)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  {token.address !==
-                    '0x0000000000000000000000000000000000000000' && (
+                  <div className="flex items-center space-x-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => openExplorer(token.address)}
+                      onClick={() => copyToClipboard(token.address)}
                       className="h-8 w-8 p-0"
+                      style={{ color: '#97fce4' }}
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <Copy className="h-4 w-4" />
                     </Button>
-                  )}
+                    {token.address !==
+                      '0x0000000000000000000000000000000000000000' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openExplorer(token.address)}
+                        className="h-8 w-8 p-0"
+                        style={{ color: '#97fce4' }}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
