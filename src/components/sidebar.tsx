@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { innerRoutePath } from '@/modules/shared/utils/route';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
-import { Home, Send, RotateCcw, Globe, User, Menu, X } from 'lucide-react';
+import { Home, Send, RotateCcw, Globe, User, X } from 'lucide-react';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 
 interface SidebarProps {
