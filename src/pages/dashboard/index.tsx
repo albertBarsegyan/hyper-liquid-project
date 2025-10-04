@@ -102,7 +102,7 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 min-h-full">
+    <div className="container-responsive py-responsive">
       {/* Error Alert */}
       {error && (
         <Alert variant="destructive" className="mb-6">
@@ -134,7 +134,7 @@ const DashboardPage: React.FC = () => {
         </Alert>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Wallet Information */}
         <div className="lg:col-span-2 space-y-6">
           <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
@@ -194,7 +194,7 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div
                   className="p-4 rounded-lg"
                   style={{ backgroundColor: '#0e1e27' }}
