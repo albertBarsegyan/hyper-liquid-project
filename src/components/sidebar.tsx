@@ -2,8 +2,9 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { innerRoutePath } from '@/modules/shared/utils/route';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
-import { Home, Send, RotateCcw, Globe, User, X } from 'lucide-react';
+import { Home, Send, RotateCcw, User, X, Trophy } from 'lucide-react';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
+import { clsx } from 'clsx';
 
 interface SidebarProps {
   className?: string;
@@ -11,6 +12,33 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
+
+const navigationItems = [
+  {
+    id: 'home',
+    label: 'Home',
+    icon: Home,
+    path: innerRoutePath.getMain(),
+  },
+  {
+    id: 'send',
+    label: 'Send',
+    icon: Send,
+    path: '/send',
+  },
+  {
+    id: 'rewards',
+    label: 'Rewards',
+    icon: Trophy,
+    path: '/rewards',
+  },
+  {
+    id: 'activity',
+    label: 'Activity',
+    icon: RotateCcw,
+    path: innerRoutePath.getTransactionHistory(),
+  },
+];
 
 const Sidebar: React.FC<SidebarProps> = ({
   className = '',
@@ -21,33 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { account, isConnected } = useWalletContext();
-
-  const navigationItems = [
-    {
-      id: 'home',
-      label: 'Home',
-      icon: Home,
-      path: innerRoutePath.getMain(),
-    },
-    {
-      id: 'send',
-      label: 'Send',
-      icon: Send,
-      path: '/send',
-    },
-    {
-      id: 'activity',
-      label: 'Activity',
-      icon: RotateCcw,
-      path: innerRoutePath.getTransactionHistory(),
-    },
-    {
-      id: 'explore',
-      label: 'Explore',
-      icon: Globe,
-      path: '/explore',
-    },
-  ];
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -64,11 +65,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const sidebarClasses = isMobile
-    ? `fixed top-0 left-0 z-50 h-full w-full transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 lg:static lg:w-64`
-    : `h-screen w-64`;
+  const sidebarClasses = clsx('lg:translate-x-0 lg:static lg:w-64', {
+    'h-screen w-64': !isMobile,
+    'fixed top-0 left-0 z-50 h-full w-full transition-transform duration-300 ease-in-out':
+      isMobile,
+    'translate-x-0': isMobile && isOpen,
+    '-translate-x-full': isMobile && !isOpen,
+  });
 
   const overlayClasses =
     isMobile && isOpen
@@ -77,7 +80,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && <div className={overlayClasses} onClick={onClose} />}
 
       {/* Sidebar */}

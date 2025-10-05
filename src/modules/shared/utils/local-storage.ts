@@ -9,9 +9,9 @@ export const localStorageUtil = {
     const item = localStorage?.getItem(key);
 
     try {
-      const itemParsed = item !== null ? JSON.parse(item) : item;
+      const itemParsed = (item !== null ? JSON.parse(item) : item) as T | null;
 
-      return item ? itemParsed : null;
+      return item ? (itemParsed as T) : null;
     } catch {
       return item as T;
     }

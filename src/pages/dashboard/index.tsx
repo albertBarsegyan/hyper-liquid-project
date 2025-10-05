@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx';
 import { HYPER_EVM_CONFIG, useWalletContext } from '@/modules/wallet';
+
 import {
   Wallet,
   Copy,
@@ -122,8 +123,6 @@ const DashboardPage: React.FC = () => {
           className="mb-6"
           style={{
             borderColor: '#ff6b6b',
-            backgroundColor: '#ff6b6b',
-            opacity: 0.1,
           }}
         >
           <AlertTriangle className="h-4 w-4" style={{ color: '#ff6b6b' }} />

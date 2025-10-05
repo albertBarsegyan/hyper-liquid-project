@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useWalletContext } from '../hooks/wallet-context';
+
 import {
   Wallet,
   Copy,
@@ -13,6 +13,7 @@ import {
   XCircle,
   Loader2,
 } from 'lucide-react';
+import { useWalletContext } from '@/modules/wallet';
 
 const WalletConnectButton: React.FC = () => {
   const {
@@ -29,6 +30,9 @@ const WalletConnectButton: React.FC = () => {
     switchToHyperEVM,
     refreshBalance,
     clearError,
+    // Unified authentication state
+    isAuthenticated,
+    authError,
   } = useWalletContext();
 
   const formatAddress = (address: string) => {
@@ -51,7 +55,7 @@ const WalletConnectButton: React.FC = () => {
 
   const handleDisconnect = () => {
     if (window.confirm('Are you sure you want to disconnect your wallet?')) {
-      disconnect();
+      disconnect(); // This now handles both wallet and auth cleanup
     }
   };
 
@@ -67,7 +71,7 @@ const WalletConnectButton: React.FC = () => {
         }}
       >
         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Connecting...
+        Connecting & Authenticating...
       </Button>
     );
   }
@@ -76,11 +80,11 @@ const WalletConnectButton: React.FC = () => {
     return (
       <div className="flex flex-col space-y-3">
         {/* Error Alert */}
-        {error && (
+        {(error ?? authError) && (
           <Alert variant="destructive" className="w-full">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
-              <span className="text-responsive-sm">{error}</span>
+              <span className="text-responsive-sm">{error ?? authError}</span>
               <Button variant="ghost" size="sm" onClick={clearError}>
                 <XCircle className="h-4 w-4" />
               </Button>
@@ -100,7 +104,7 @@ const WalletConnectButton: React.FC = () => {
           <div className="flex-1 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
               <span
-                className="font-medium text-responsive-sm break-all"
+                className="font-medium text-responsive-sm"
                 style={{ color: '#97fce4' }}
               >
                 {formatAddress(account!)}
@@ -135,6 +139,10 @@ const WalletConnectButton: React.FC = () => {
                   </span>
                 </>
               )}
+              <span>•</span>
+              <span style={{ color: isAuthenticated ? '#97fce4' : '#ff6b6b' }}>
+                {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
+              </span>
             </div>
           </div>
 
@@ -217,7 +225,7 @@ const WalletConnectButton: React.FC = () => {
         }}
       >
         <Wallet className="mr-2 h-5 w-5" />
-        Connect to HyperEVM
+        Connect & Authenticate
       </Button>
 
       {error && (

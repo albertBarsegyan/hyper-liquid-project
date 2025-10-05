@@ -32,11 +32,6 @@ const AuthenticatedLayout: React.FC = () => {
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <Sidebar />
-      </div>
-
       {/* Mobile Sidebar */}
       <Sidebar
         isMobile={true}

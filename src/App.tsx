@@ -5,10 +5,10 @@ import { authenticatedRoutes } from '@/routes/authenticated.tsx';
 import { guestRoutes } from '@/routes/guest.tsx';
 
 function App() {
-  const { isConnected } = useWalletContext();
+  const { authUser } = useWalletContext();
 
   return (
-    <RouterProvider router={isConnected ? authenticatedRoutes : guestRoutes} />
+    <RouterProvider router={authUser ? authenticatedRoutes : guestRoutes} />
   );
 }
 

@@ -5,6 +5,7 @@ import DashboardPage from '../pages/dashboard';
 import TransactionHistoryPage from '../pages/transaction-history/index.tsx';
 import SendPage from '../pages/send/index.tsx';
 import ExplorePage from '../pages/explore/index.tsx';
+import RewardsPage from '../pages/rewards/index.tsx';
 
 export const authenticatedRoutes = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: '/send',
         element: <SendPage />,
+      },
+      {
+        path: '/rewards',
+        element: <RewardsPage />,
       },
       {
         path: '/explore',
