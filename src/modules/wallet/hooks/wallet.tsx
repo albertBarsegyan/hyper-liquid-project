@@ -6,7 +6,14 @@ import {
   HYPER_EVM_CONFIG,
 } from '@/modules/wallet/types';
 
-import { getWalletErrorMessage } from '@/modules/wallet/utils';
+import { localStorageUtil } from '@/modules/shared/utils/local-storage.ts';
+import { getErrorMessage } from '@/modules/shared/utils/error.ts';
+import {
+  authService,
+  type AuthUser,
+} from '@/modules/auth/services/auth.service.ts';
+import { storageName } from '@/modules/shared/constants/storage-name.ts';
+import { responseMessage } from '@/modules/shared/constants/app-messages.ts';
 
 type ErrorWithCode = { code: unknown; error?: unknown };
 
@@ -14,7 +21,6 @@ const getErrorCode = (error: unknown): number | undefined => {
   if (typeof error === 'object' && error !== null) {
     const errObj = error as ErrorWithCode;
 
-    // Check nested error (ethers v6 wrapping)
     if (errObj.error && typeof errObj.error === 'object') {
       const inner = errObj.error as ErrorWithCode;
       if (typeof inner.code === 'number') {
@@ -22,7 +28,6 @@ const getErrorCode = (error: unknown): number | undefined => {
       }
     }
 
-    // Check direct code
     if (typeof errObj.code === 'number') {
       return errObj.code;
     }
@@ -50,6 +55,10 @@ const useWallet = (): WalletContextType => {
   const [state, setState] = useState<WalletState>(defaultState);
   const providerRef = useRef<BrowserProvider | null>(null);
 
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
   const getProvider = useCallback((): BrowserProvider | null => {
     if (!window.ethereum) return null;
 
@@ -58,34 +67,56 @@ const useWallet = (): WalletContextType => {
     return providerRef.current;
   }, []);
 
-  // Check if user manually disconnected
   const isManuallyDisconnected = (): boolean => {
-    return localStorage.getItem(DISCONNECT_STATE_KEY) === 'true';
+    return localStorageUtil.getItem(DISCONNECT_STATE_KEY) === 'true';
   };
 
-  // Set disconnect state in localStorage
   const setDisconnectState = (disconnected: boolean) => {
-    if (disconnected) {
-      localStorage.setItem(DISCONNECT_STATE_KEY, 'true');
-    } else {
-      localStorage.removeItem(DISCONNECT_STATE_KEY);
-    }
+    if (disconnected) localStorageUtil.setItem(DISCONNECT_STATE_KEY, 'true');
+    else localStorageUtil.deleteItem(DISCONNECT_STATE_KEY);
   };
 
   const setLastAccount = (account: string | null) => {
-    if (account) localStorage.setItem(WALLET_ACCOUNT_KEY, account);
-    else localStorage.removeItem(WALLET_ACCOUNT_KEY);
+    if (account) localStorageUtil.setItem(WALLET_ACCOUNT_KEY, account);
+    else localStorageUtil.deleteItem(WALLET_ACCOUNT_KEY);
   };
 
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));
+    setAuthError(null);
+  }, []);
+
+  // Initialize authentication state
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+      if (token) {
+        const currentUser = await authService.getProfile();
+        if (currentUser) {
+          setAuthUser(currentUser);
+          setIsAuthenticated(true);
+
+          // Verify token with server
+          try {
+            const isValid = await authService.verifyToken();
+            if (!isValid) {
+              setAuthUser(null);
+              setIsAuthenticated(false);
+            }
+          } catch (error) {
+            console.error('Token verification failed:', error);
+            setAuthUser(null);
+            setIsAuthenticated(false);
+          }
+        }
+      }
+    };
+
+    void initializeAuth();
   }, []);
 
   const setError = useCallback((error: unknown) => {
-    const message =
-      error instanceof Error
-        ? getWalletErrorMessage(error)
-        : 'An unknown error occurred';
+    const message = getErrorMessage(error);
     setState(prev => ({ ...prev, error: message }));
   }, []);
 
@@ -161,15 +192,10 @@ const useWallet = (): WalletContextType => {
                 await provider.send('wallet_addEthereumChain', [
                   HYPER_EVM_CONFIG,
                 ]);
-              } catch (addError) {
-                console.warn('Failed to add HyperEVM network:', addError);
+              } catch {
+                setError('Failed to add HyperEVM network');
               }
-            } else {
-              console.warn(
-                'Failed to switch to HyperEVM network:',
-                switchError
-              );
-            }
+            } else setError('Failed to switch to HyperEVM network:');
           }
         }
 
@@ -189,7 +215,6 @@ const useWallet = (): WalletContextType => {
         setLastAccount(null);
       }
     } catch (error) {
-      console.error('Error checking connection:', error);
       setError(error);
     }
   }, [getProvider, setError, updateBalance]);
@@ -211,20 +236,16 @@ const useWallet = (): WalletContextType => {
         { chainId: HYPER_EVM_CONFIG.chainId },
       ]);
     } catch (switchError) {
-      console.log('switchError', switchError);
       const errorCode = getErrorCode(switchError);
       if (errorCode === 4902) {
         try {
           await provider.send('wallet_addEthereumChain', [HYPER_EVM_CONFIG]);
         } catch (addError) {
-          console.log('addError', addError);
           const addErrorCode = getErrorCode(addError);
           if (addErrorCode === -32002)
             setError('Please check your metamask application');
         }
-      } else {
-        setError(switchError);
-      }
+      } else setError(switchError);
     }
   }, [getProvider, setError]);
 
@@ -252,8 +273,6 @@ const useWallet = (): WalletContextType => {
       const network = await provider.getNetwork();
       const chainIdHex = '0x' + network.chainId.toString(16);
 
-      console.log('chainIdHex', chainIdHex);
-
       const isMetaMask = window.ethereum?.isMetaMask ?? false;
       const isCorrectNetwork = chainIdHex === HYPER_EVM_CONFIG.chainId;
 
@@ -268,27 +287,47 @@ const useWallet = (): WalletContextType => {
         error: null,
       }));
 
+      try {
+        const nonce = await authService.requestNonce(account);
+        const signature = await signer.signMessage(nonce);
+
+        await authService.authenticateWithWallet(account, signature);
+
+        const profile = await authService.getProfile();
+
+        setAuthUser(profile);
+        setIsAuthenticated(true);
+        setAuthError(null);
+      } catch {
+        setAuthError(responseMessage.WENT_WRONG);
+      }
+
       if (!isCorrectNetwork) {
         try {
           await switchToHyperEVM();
-        } catch (switchError) {
-          console.warn('Failed to switch to HyperEVM network:', switchError);
+        } catch {
+          setAuthError('Failed to switch to HyperEVM network');
         }
       }
 
       await updateBalance(account);
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         isConnecting: false,
       }));
-      setError(error);
+      setError(responseMessage.WENT_WRONG);
     }
   }, [getProvider, setError, updateBalance, switchToHyperEVM]);
 
   const disconnect = useCallback(() => {
     setDisconnectState(true);
     setLastAccount(null);
+
+    authService.signOut();
+    setAuthUser(null);
+    setIsAuthenticated(false);
+    setAuthError(null);
 
     setState(defaultState);
   }, []);
@@ -318,16 +357,15 @@ const useWallet = (): WalletContextType => {
   const handleChainChanged = useCallback(
     (...args: unknown[]) => {
       const chainId = args[0] as string;
+
       if (chainId) {
         setState(prev => ({
           ...prev,
           chainId: chainId,
           isCorrectNetwork: chainId === HYPER_EVM_CONFIG.chainId,
         }));
-        // Only check connection if user hasn't manually disconnected
-        if (!isManuallyDisconnected()) {
-          void checkConnection();
-        }
+
+        if (!isManuallyDisconnected()) void checkConnection();
       }
     },
     [checkConnection]
@@ -358,6 +396,9 @@ const useWallet = (): WalletContextType => {
     refreshBalance,
     getProvider,
     clearError,
+    authUser,
+    isAuthenticated,
+    authError,
   };
 };
 

@@ -475,9 +475,13 @@ export default function TransactionHistoryPage() {
     <div className="container-responsive py-responsive space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-responsive-3xl font-bold" style={{ color: '#97fce4' }}>
+          <h1
+            className="text-responsive-3xl font-bold"
+            style={{ color: '#97fce4' }}
+          >
             Transaction History
           </h1>
+
           <p
             className="text-responsive-base"
             style={{ color: '#97fce4', opacity: 0.8 }}

@@ -9,7 +9,7 @@ import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 const LandingPage: React.FC = () => {
   return (
     <div
-      className="min-h-screen flex flex-col lg:flex-row lg:items-center justify-between"
+      className="min-h-screen flex flex-col lg:flex-row [align-items:normal] lg:justify-between"
       style={{ backgroundColor: '#0e1e27' }}
     >
       <div className="flex flex-col items-start justify-between flex-1 p-responsive">
