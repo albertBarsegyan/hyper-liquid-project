@@ -26,15 +26,15 @@ const LandingPage: React.FC = () => {
         <div className="flex flex-col gap-6 w-full max-w-2xl">
           <div className="flex flex-col gap-4">
             <h1
-              className="text-responsive-3xl sm:text-responsive-4xl lg:text-6xl uppercase font-bold leading-tight"
+              className="text-responsive-3xl sm:text-responsive-4xl lg:text-6xl capitalise font-bold leading-tight"
               style={{ color: '#97fce4' }}
             >
-              happy to see you there
+              Decentralized RWA liquidity on HyperEVM
             </h1>
             <div className="text-responsive-lg sm:text-responsive-xl lg:text-2xl">
               <Typewriter
                 className="capitalize opacity-80"
-                text="connect your wallet and start earn crypto today"
+                text="Connect your wallet and start to earn CC."
               />
             </div>
           </div>
