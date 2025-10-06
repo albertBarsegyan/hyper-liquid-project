@@ -5,8 +5,17 @@ import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
+import { Carousel } from '@/components/ui/carousel';
+
+// Import background images
+import bg1 from '@/assets/images/bg-1.jpg';
+import bg2 from '@/assets/images/bg-2.jpg';
+import bg3 from '@/assets/images/bg-3.jpg';
+import bg4 from '@/assets/images/bg-4.jpg';
 
 const LandingPage: React.FC = () => {
+  const carouselImages = [bg1, bg2, bg3, bg4];
+
   return (
     <div
       className="min-h-screen flex flex-col lg:flex-row [align-items:normal] lg:justify-between"
@@ -46,16 +55,14 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Right side decorative space */}
+      {/* Right side carousel */}
       <div className="hidden lg:flex flex-1 p-6">
-        <div className="w-full h-full flex items-center justify-center">
-          <div
-            className="w-96 h-96 rounded-full opacity-10"
-            style={{
-              background:
-                'radial-gradient(circle, #97fce4 0%, transparent 70%)',
-              filter: 'blur(100px)',
-            }}
+        <div className="w-full h-full">
+          <Carousel
+            images={carouselImages}
+            autoPlay={true}
+            interval={4000}
+            className="h-full shadow-2xl"
           />
         </div>
       </div>
