@@ -22,7 +22,7 @@ const LandingPage: React.FC = () => {
       style={{ backgroundColor: '#0e1e27' }}
     >
       {/* Content Section */}
-      <div className="h-screen z-10 flex flex-col h-[inherit] lg:flex-row lg:justify-between lg:flex-1">
+      <div className="h-screen z-10 flex flex-col lg:flex-row lg:justify-between lg:flex-1">
         <div className=" flex flex-col items-start justify-between flex-1 p-responsive">
           {/* Header */}
           <div className="w-full">
@@ -48,8 +48,8 @@ const LandingPage: React.FC = () => {
               </h1>
               <div className="text-responsive-lg sm:text-responsive-xl lg:text-2xl">
                 <Typewriter
-                  className="capitalize opacity-80"
-                  text="Connect your wallet and start to join Genesis Compaign."
+                  className="capitalize text-[14px] lg:text-[18px] opacity-80"
+                  text="Connect your wallet and join Genesis Compaign."
                 />
               </div>
             </div>

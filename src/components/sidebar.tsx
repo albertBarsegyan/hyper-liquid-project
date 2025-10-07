@@ -137,6 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Account Section */}
         <div className="p-4 border-t" style={{ borderColor: '#97fce4' }}>
           <Button
+            onClick={() => navigate(innerRoutePath.getMain())}
             className="w-full h-12 px-4 rounded-lg"
             style={{
               backgroundColor: '#021e17',
