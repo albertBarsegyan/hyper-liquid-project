@@ -20,20 +20,20 @@ export const Carousel: React.FC<CarouselProps> = ({
     if (!autoPlay || images.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentIndex(prevIndex => (prevIndex + 1) % images.length);
     }, interval);
 
     return () => clearInterval(timer);
   }, [autoPlay, interval, images.length]);
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex(prevIndex =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentIndex(prevIndex => (prevIndex + 1) % images.length);
   };
 
   const goToSlide = (index: number) => {
@@ -43,7 +43,9 @@ export const Carousel: React.FC<CarouselProps> = ({
   if (!images.length) return null;
 
   return (
-    <div className={`relative w-full h-full overflow-hidden rounded-lg ${className}`}>
+    <div
+      className={`relative w-full h-full overflow-hidden rounded-lg ${className}`}
+    >
       {/* Main carousel container */}
       <div className="relative w-full h-full">
         {images.map((image, index) => (
@@ -56,7 +58,7 @@ export const Carousel: React.FC<CarouselProps> = ({
             <img
               src={image}
               alt={`Carousel image ${index + 1}`}
-              className="w-full h-full object-cover rounded-lg"
+              className="w-full h-full object-cover rounded-lg filter lg:filter-none blur-sm lg:blur-none brightness-75 lg:brightness-100 "
             />
           </div>
         ))}
@@ -67,14 +69,14 @@ export const Carousel: React.FC<CarouselProps> = ({
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-10"
+            className="absolute hidden lg:visible left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-10"
             aria-label="Previous image"
           >
             <ChevronLeft size={24} />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-10"
+            className="absolute hidden lg:visible right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-10"
             aria-label="Next image"
           >
             <ChevronRight size={24} />
@@ -84,7 +86,7 @@ export const Carousel: React.FC<CarouselProps> = ({
 
       {/* Dots indicator */}
       {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+        <div className="absolute hidden lg:visible bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
           {images.map((_, index) => (
             <button
               key={index}
