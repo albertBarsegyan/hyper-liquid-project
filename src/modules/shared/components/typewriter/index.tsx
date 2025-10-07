@@ -10,13 +10,13 @@ type TypewriterProps = {
 
 export const Typewriter: React.FC<TypewriterProps> = ({
   text,
-  duration = 6000,
+  duration = 7000,
   className,
 }) => {
   const steps = text.split('').length * 2;
 
   const style = {
-    animation: `typing ${duration}ms steps(${steps}, end) 1s forwards infinite, blinkCaret 1s step-end infinite ${duration + 1}ms`,
+    animation: `typing ${duration}ms steps(${steps}, end) forwards, blinkCaret 1s step-end infinite 1s`,
   };
 
   return (
