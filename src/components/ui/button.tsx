@@ -1,30 +1,30 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils.ts';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95',
   {
     variants: {
       variant: {
         default:
-          'cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90',
+          'cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 hover:brightness-110',
         destructive:
-          'cursor-pointer bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'cursor-pointer bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:brightness-110',
         outline:
-          'cursor-pointer border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+          'cursor-pointer border border-input bg-background hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         secondary:
-          'cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'cursor-pointer hover:bg-accent hover:text-accent-foreground',
-        link: 'cursor-pointer text-primary underline-offset-4 hover:underline',
+          'cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:brightness-110 active:bg-secondary/70',
+        ghost:
+          'cursor-pointer hover:bg-accent hover:text-accent-foreground active:bg-accent/70',
+        link: 'cursor-pointer text-primary underline-offset-4 hover:underline hover:text-primary/90 active:text-primary/80',
       },
       size: {
         default: 'px-4 py-2',
         sm: 'h-9 rounded-md px-3',
         lg: 'h-11 rounded-md px-8',
-        icon: 'w-10',
+        icon: 'w-10 h-10',
       },
     },
     defaultVariants: {

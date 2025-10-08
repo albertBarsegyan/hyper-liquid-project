@@ -4,8 +4,8 @@ import styles from './styles.module.css';
 
 type TypewriterProps = {
   text: string;
-  duration?: number; // ms, default 4000
-  className?: string; // for Tailwind or extra classes
+  duration?: number;
+  className?: string;
 };
 
 export const Typewriter: React.FC<TypewriterProps> = ({
@@ -13,7 +13,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
   duration = 7000,
   className,
 }) => {
-  const steps = text.split('').length * 2;
+  const steps = text.split('').length;
 
   const style = {
     animation: `typing ${duration}ms steps(${steps}, end) forwards, blinkCaret 1s step-end infinite 1s`,

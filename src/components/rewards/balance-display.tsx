@@ -70,7 +70,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
               className="text-responsive-sm font-medium"
               style={{ color: '#97fce4' }}
             >
-              Recent Achievements
+              Qualified for Canton coin reward
             </p>
             <div className="space-y-3">
               {achievements.map(achievement => {

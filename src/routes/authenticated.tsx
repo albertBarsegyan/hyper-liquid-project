@@ -6,10 +6,12 @@ import TransactionHistoryPage from '../pages/transaction-history/index.tsx';
 import SendPage from '../pages/send/index.tsx';
 import ExplorePage from '../pages/explore/index.tsx';
 import RewardsPage from '../pages/rewards/index.tsx';
+import ActivityPage from '../pages/activity/index.tsx';
+import DocsPage from '@/pages/docs';
 
 export const authenticatedRoutes = createBrowserRouter([
   {
-    path: '/',
+    path: innerRoutePath.getMain(),
     element: <AuthenticatedLayout />,
     children: [
       {
@@ -21,16 +23,24 @@ export const authenticatedRoutes = createBrowserRouter([
         element: <TransactionHistoryPage />,
       },
       {
-        path: '/send',
+        path: innerRoutePath.getSend(),
         element: <SendPage />,
       },
       {
-        path: '/rewards',
+        path: innerRoutePath.getRewards(),
         element: <RewardsPage />,
       },
       {
-        path: '/explore',
+        path: innerRoutePath.getDocs(),
+        element: <DocsPage />,
+      },
+      {
+        path: innerRoutePath.getExplore(),
         element: <ExplorePage />,
+      },
+      {
+        path: innerRoutePath.getActivity(),
+        element: <ActivityPage />,
       },
       {
         path: innerRoutePath.getAll(),

@@ -40,22 +40,22 @@ const RewardsPage: React.FC = () => {
   const achievements: Reward[] = [
     {
       id: 'sendtag',
-      title: 'Sendtag Purchased',
+      title: 'Deposit 10$',
       amount: 1000,
       icon: Star,
       color: '#97fce4',
     },
     {
       id: 'balance',
-      title: 'Balance 8,000',
+      title: 'Make balance 8,888',
       amount: 5000,
       icon: Coins,
       color: '#97fce4',
     },
     {
       id: 'savings',
-      title: 'Savings Deposit $30',
-      amount: 2028,
+      title: 'Make 3 referral',
+      amount: 3000,
       icon: TrendingUp,
       color: '#97fce4',
     },
@@ -84,7 +84,7 @@ const RewardsPage: React.FC = () => {
     },
     {
       id: 'sends-10',
-      title: '10+ Sends',
+      title: '10+ DLIQD',
       description: 'Complete 10 transactions',
       status: 'pending',
       reward: 150,
@@ -94,7 +94,7 @@ const RewardsPage: React.FC = () => {
     },
     {
       id: 'sends-100',
-      title: '100+ Sends',
+      title: '100+ DLIQD',
       description: 'Complete 100 transactions',
       status: 'pending',
       reward: 500,
@@ -103,9 +103,9 @@ const RewardsPage: React.FC = () => {
       maxProgress: 100,
     },
     {
-      id: 'streak',
-      title: 'Send Streak',
-      description: 'Maintain daily sending streak',
+      id: 'momentum',
+      title: 'DLIQD momentum',
+      description: 'Maintain daily DLIQD momentum',
       status: 'ongoing',
       reward: 50,
       icon: Clock,
@@ -139,7 +139,7 @@ const RewardsPage: React.FC = () => {
             className="text-responsive-base"
             style={{ color: '#97fce4', opacity: 0.8 }}
           >
-            Earn SEND tokens by completing activities and tasks
+            Earn DLIQD points by completing activities and tasks
           </p>
         </div>
 
@@ -147,7 +147,7 @@ const RewardsPage: React.FC = () => {
         <BalanceDisplay
           balance={sendBalance}
           monthlyEarned={monthlyRewards}
-          currency="SEND"
+          currency="DLIQD"
           achievements={achievements}
         />
 
@@ -159,19 +159,25 @@ const RewardsPage: React.FC = () => {
           >
             Tasks
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tasks.map(task => (
-              <RewardCard
-                key={task.id}
-                {...task}
-                onStart={() => handleTaskStart(task.id)}
-              />
-            ))}
+          <div className="relative">
+            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl z-10 bold">
+              Coming soon
+            </p>
+
+            <div className="filter blur-sm  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tasks.map(task => (
+                <RewardCard
+                  key={task.id}
+                  {...task}
+                  onStart={() => handleTaskStart(task.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Rewards History */}
-        <RewardsHistory rewards={historyRewards} currency="SEND" />
+        <RewardsHistory rewards={historyRewards} currency="DLIQD" />
       </div>
     </div>
   );

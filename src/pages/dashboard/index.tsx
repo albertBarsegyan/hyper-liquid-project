@@ -19,6 +19,11 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react';
+import { toQueryString } from '@/modules/shared/utils/url.ts';
+
+const generateReferralCode = (address: string): string => {
+  return window.location.origin + toQueryString({ referred: address });
+};
 
 const DashboardPage: React.FC = () => {
   const {
@@ -227,6 +232,43 @@ const DashboardPage: React.FC = () => {
                   >
                     {isMetaMask ? 'MetaMask' : 'Other'}
                   </p>
+                </div>
+              </div>
+
+              <div
+                className="flex w-full items-center justify-between gap-4 p-4 rounded-lg"
+                style={{ backgroundColor: '#0e1e27' }}
+              >
+                <div className=" w-full">
+                  <p
+                    className="text-sm font-medium mb-1"
+                    style={{ color: '#97fce4', opacity: 0.8 }}
+                  >
+                    Referral Code
+                  </p>
+                  <p
+                    className="text-lg font-semibold"
+                    style={{ color: '#97fce4' }}
+                  >
+                    {formatAddress(account!)}
+                  </p>
+                </div>
+
+                <div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(generateReferralCode(account!))
+                    }
+                    style={{
+                      borderColor: '#97fce4',
+                      color: '#97fce4',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardContent>

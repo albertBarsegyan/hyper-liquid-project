@@ -20,7 +20,7 @@ export interface WalletError extends Error {
 }
 
 export interface WalletContextType extends WalletState {
-  connect: () => Promise<void>;
+  connect: (referredAddress?: string | null) => Promise<void>;
   disconnect: () => void;
   switchToHyperEVM: () => Promise<void>;
   refreshBalance: () => Promise<void>;
@@ -30,6 +30,7 @@ export interface WalletContextType extends WalletState {
   authUser: AuthUser | null;
   isAuthenticated: boolean;
   authError: string | null;
+  loading: boolean;
 }
 
 export const HYPER_EVM_CONFIG: AddEthereumChainParameter = {
