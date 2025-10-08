@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import AuthenticatedLayout from '../components/authenticated-layout';
 import DashboardPage from '../pages/dashboard';
-import TransactionHistoryPage from '../pages/transaction-history/index.tsx';
 import SendPage from '../pages/send/index.tsx';
 import ExplorePage from '../pages/explore/index.tsx';
 import RewardsPage from '../pages/rewards/index.tsx';
@@ -17,10 +16,6 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getMain(),
         element: <DashboardPage />,
-      },
-      {
-        path: innerRoutePath.getTransactionHistory(),
-        element: <TransactionHistoryPage />,
       },
       {
         path: innerRoutePath.getSend(),

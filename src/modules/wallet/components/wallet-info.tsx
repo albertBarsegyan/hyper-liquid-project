@@ -44,7 +44,7 @@ const WalletInfo: React.FC = () => {
       </div>
     );
   }
-  console.log('chainId', chainId);
+
   const isHyperEVM = String(chainId) === HYPER_EVM_CONFIG.chainId;
   const statusColor = isCorrectNetwork ? '#97fce4' : '#ff6b6b';
   const statusText = isCorrectNetwork ? 'Connected' : 'Wrong Network';

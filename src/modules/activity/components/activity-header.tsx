@@ -39,7 +39,7 @@ export const ActivityHeader: React.FC = () => {
                   <div>
                     <p className="text-gray-400 text-sm">Successful</p>
                     <p className="text-white font-semibold text-lg">
-                      {referralStats.successfulReferrals}
+                      {referralStats.successfulReferrals ?? 0}
                     </p>
                   </div>
                 </div>
