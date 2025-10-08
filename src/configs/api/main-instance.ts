@@ -25,8 +25,7 @@ export const mainApiInstance = ky.create({
     beforeError: [
       async error => {
         const { response } = error;
-        console.log('error', error);
-        console.log('response', response);
+
         if (!navigator.onLine || error.name === 'TypeError') {
           error.message = 'No internet connection. Please check your network.';
           return error;

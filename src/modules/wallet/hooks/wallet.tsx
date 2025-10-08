@@ -90,7 +90,6 @@ const useWallet = (): WalletContextType => {
   // Initialize authentication state
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('init');
       const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
       if (!token) return;
 
@@ -291,7 +290,7 @@ const useWallet = (): WalletContextType => {
 
         try {
           const nonce = await authService.requestNonce(account);
-          console.log('nonce', nonce);
+
           const signature = await signer.signMessage(nonce);
 
           const { access_token } = await authService.verifySignature({
@@ -303,8 +302,6 @@ const useWallet = (): WalletContextType => {
           if (!access_token) return;
 
           localStorageUtil.setItem(storageName.AUTH_TOKEN, access_token);
-
-          console.log('here');
 
           const profile = await authService.getProfile();
 
@@ -324,8 +321,7 @@ const useWallet = (): WalletContextType => {
         }
 
         await updateBalance(account);
-      } catch (error) {
-        console.log({ error });
+      } catch {
         setState(prev => ({
           ...prev,
           isConnecting: false,

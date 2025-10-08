@@ -85,7 +85,6 @@ export const authService = {
     signature: string;
     referredAddress?: string | null;
   }): Promise<{ access_token: string }> => {
-    console.log('start verify');
     const response = await mainApiInstance.post('auth/verify', {
       json: {
         address,
@@ -93,8 +92,6 @@ export const authService = {
         referredAddresses: referredAddress ? [referredAddress] : [],
       },
     });
-
-    console.log('response', response);
 
     return response.json<{ access_token: string }>();
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import RewardCard from '@/components/rewards/reward-card';
 import BalanceDisplay from '@/components/rewards/balance-display';
@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Clock,
 } from 'lucide-react';
+import { useWalletContext } from '@/modules/wallet';
 
 interface Task {
   id: string;
@@ -24,106 +25,94 @@ interface Task {
   maxProgress?: number;
 }
 
-interface Reward {
+export interface Reward {
   id: string;
   title: string;
   amount: number;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  color: string;
+  achieved: boolean;
 }
 
+const achievements: Reward[] = [
+  {
+    id: 'sendtag',
+    title: 'Deposit 10$',
+    amount: 1000,
+    icon: Star,
+    achieved: false,
+  },
+  {
+    id: 'balance',
+    title: 'Make balance 8,888',
+    amount: 5000,
+    icon: Coins,
+    achieved: false,
+  },
+  {
+    id: 'savings',
+    title: 'Make 3 referral',
+    amount: 3000,
+    icon: TrendingUp,
+    achieved: true,
+  },
+];
+
+const tasks: Task[] = [
+  {
+    id: 'passkey',
+    title: 'Create a Passkey',
+    description: 'Set up biometric authentication',
+    status: 'completed',
+    reward: 100,
+    icon: Target,
+    progress: 1,
+    maxProgress: 1,
+  },
+  {
+    id: 'sendtag-purchase',
+    title: 'Purchase a Sendtag',
+    description: 'Buy your personalized sendtag',
+    status: 'completed',
+    reward: 200,
+    icon: Star,
+    progress: 1,
+    maxProgress: 1,
+  },
+  {
+    id: 'sends-10',
+    title: '10+ DLIQD',
+    description: 'Complete 10 transactions',
+    status: 'pending',
+    reward: 150,
+    icon: Zap,
+    progress: 7,
+    maxProgress: 10,
+  },
+  {
+    id: 'sends-100',
+    title: '100+ DLIQD',
+    description: 'Complete 100 transactions',
+    status: 'pending',
+    reward: 500,
+    icon: Trophy,
+    progress: 7,
+    maxProgress: 100,
+  },
+  {
+    id: 'momentum',
+    title: 'DLIQD momentum',
+    description: 'Maintain daily DLIQD momentum',
+    status: 'ongoing',
+    reward: 50,
+    icon: Clock,
+    progress: 3,
+    maxProgress: 7,
+  },
+];
+
 const RewardsPage: React.FC = () => {
-  const [currentMonth] = useState('October');
-  const [sendBalance] = useState(8028);
-  const [monthlyRewards] = useState(28);
-
-  const achievements: Reward[] = [
-    {
-      id: 'sendtag',
-      title: 'Deposit 10$',
-      amount: 1000,
-      icon: Star,
-      color: '#97fce4',
-    },
-    {
-      id: 'balance',
-      title: 'Make balance 8,888',
-      amount: 5000,
-      icon: Coins,
-      color: '#97fce4',
-    },
-    {
-      id: 'savings',
-      title: 'Make 3 referral',
-      amount: 3000,
-      icon: TrendingUp,
-      color: '#97fce4',
-    },
-  ];
-
-  const tasks: Task[] = [
-    {
-      id: 'passkey',
-      title: 'Create a Passkey',
-      description: 'Set up biometric authentication',
-      status: 'completed',
-      reward: 100,
-      icon: Target,
-      progress: 1,
-      maxProgress: 1,
-    },
-    {
-      id: 'sendtag-purchase',
-      title: 'Purchase a Sendtag',
-      description: 'Buy your personalized sendtag',
-      status: 'completed',
-      reward: 200,
-      icon: Star,
-      progress: 1,
-      maxProgress: 1,
-    },
-    {
-      id: 'sends-10',
-      title: '10+ DLIQD',
-      description: 'Complete 10 transactions',
-      status: 'pending',
-      reward: 150,
-      icon: Zap,
-      progress: 7,
-      maxProgress: 10,
-    },
-    {
-      id: 'sends-100',
-      title: '100+ DLIQD',
-      description: 'Complete 100 transactions',
-      status: 'pending',
-      reward: 500,
-      icon: Trophy,
-      progress: 7,
-      maxProgress: 100,
-    },
-    {
-      id: 'momentum',
-      title: 'DLIQD momentum',
-      description: 'Maintain daily DLIQD momentum',
-      status: 'ongoing',
-      reward: 50,
-      icon: Clock,
-      progress: 3,
-      maxProgress: 7,
-    },
-  ];
-
-  const historyRewards = achievements.map(achievement => ({
-    ...achievement,
-    date: `${currentMonth} ${new Date().getFullYear()}`,
-  }));
-
-  const handleTaskStart = (taskId: string) => {
-    console.log(`Starting task: ${taskId}`);
-    // Implement task start logic here
-  };
-
+  const { balance } = useWalletContext();
+  console.log('balance', balance);
   return (
     <div className="container-responsive py-responsive">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -145,8 +134,7 @@ const RewardsPage: React.FC = () => {
 
         {/* Monthly Rewards Summary */}
         <BalanceDisplay
-          balance={sendBalance}
-          monthlyEarned={monthlyRewards}
+          balance={balance}
           currency="DLIQD"
           achievements={achievements}
         />
@@ -166,18 +154,14 @@ const RewardsPage: React.FC = () => {
 
             <div className="filter blur-sm  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {tasks.map(task => (
-                <RewardCard
-                  key={task.id}
-                  {...task}
-                  onStart={() => handleTaskStart(task.id)}
-                />
+                <RewardCard key={task.id} {...task} onStart={() => {}} />
               ))}
             </div>
           </div>
         </div>
 
         {/* Rewards History */}
-        <RewardsHistory rewards={historyRewards} currency="DLIQD" />
+        <RewardsHistory rewards={[]} currency="DLIQD" />
       </div>
     </div>
   );
