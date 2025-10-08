@@ -1,11 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { referralService } from '@/modules/referral/services/referral.service';
 import type {
-  ReferralUser,
-  ReferralStats,
-  ReferralCodeResponse,
-  ReferralHistory,
   ReferralDepositParams,
   ReferralBalanceParams,
   ReferralBonusParams,
@@ -21,39 +17,6 @@ export const REFERRAL_QUERY_KEYS = {
 };
 
 /**
- * Hook to get user's referral profile
- */
-export const useReferralProfile = () => {
-  return useQuery({
-    queryKey: REFERRAL_QUERY_KEYS.profile,
-    queryFn: () => referralService.getReferralProfile(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-};
-
-/**
- * Hook to get user's referral statistics
- */
-export const useReferralStats = () => {
-  return useQuery({
-    queryKey: REFERRAL_QUERY_KEYS.stats,
-    queryFn: () => referralService.getReferralStats(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-};
-
-/**
- * Hook to get user's referral code
- */
-export const useReferralCode = () => {
-  return useQuery({
-    queryKey: REFERRAL_QUERY_KEYS.code,
-    queryFn: () => referralService.getReferralCode(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-};
-
-/**
  * Hook to get referral history
  */
 export const useReferralHistory = () => {
@@ -61,17 +24,6 @@ export const useReferralHistory = () => {
     queryKey: REFERRAL_QUERY_KEYS.history,
     queryFn: () => referralService.getReferralHistory(),
     staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-};
-
-/**
- * Hook to get referral leaderboard
- */
-export const useReferralLeaderboard = (limit: number = 10) => {
-  return useQuery({
-    queryKey: [...REFERRAL_QUERY_KEYS.leaderboard, limit],
-    queryFn: () => referralService.getReferralLeaderboard(limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -126,45 +78,6 @@ export const useAwardReferralBonus = () => {
 };
 
 /**
- * Hook to validate referral code
- */
-export const useValidateReferralCode = () => {
-  return useMutation({
-    mutationFn: (code: string) => referralService.validateReferralCode(code),
-  });
-};
-
-/**
- * Hook to apply referral code
- */
-export const useApplyReferralCode = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (code: string) => referralService.applyReferralCode(code),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: REFERRAL_QUERY_KEYS.profile });
-    },
-  });
-};
-
-/**
- * Hook to track referral conversion
- */
-export const useTrackReferralConversion = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ referralId, action, value }: { referralId: string; action: string; value?: number }) =>
-      referralService.trackReferralConversion(referralId, action, value),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: REFERRAL_QUERY_KEYS.history });
-      queryClient.invalidateQueries({ queryKey: REFERRAL_QUERY_KEYS.stats });
-    },
-  });
-};
-
-/**
  * Custom hook for referral logic management
  */
 export const useReferralLogic = () => {
@@ -174,57 +87,72 @@ export const useReferralLogic = () => {
   const awardBalanceMilestoneMutation = useAwardBalanceMilestone();
   const awardReferralBonusMutation = useAwardReferralBonus();
 
-  const awardDepositPoints = useCallback(async (userId: string, depositedUsd: number) => {
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      const result = await awardDepositPointsMutation.mutateAsync({
-        userId,
-        depositedUsd,
-      });
-      return result;
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [awardDepositPointsMutation, isProcessing]);
+  const awardDepositPoints = useCallback(
+    async (userId: string, depositedUsd: number) => {
+      if (isProcessing) return;
 
-  const awardBalanceMilestone = useCallback(async (userId: string, currentBalanceUsd: number) => {
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      const result = await awardBalanceMilestoneMutation.mutateAsync({
-        userId,
-        currentBalanceUsd,
-      });
-      return result;
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [awardBalanceMilestoneMutation, isProcessing]);
+      setIsProcessing(true);
+      try {
+        const result = await awardDepositPointsMutation.mutateAsync({
+          userId,
+          depositedUsd,
+        });
+        return result;
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [awardDepositPointsMutation, isProcessing]
+  );
 
-  const awardReferralBonus = useCallback(async (userId: string, totalSuccessfulReferrals: number) => {
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      const result = await awardReferralBonusMutation.mutateAsync({
-        userId,
-        totalSuccessfulReferrals,
-      });
-      return result;
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [awardReferralBonusMutation, isProcessing]);
+  const awardBalanceMilestone = useCallback(
+    async (userId: string, currentBalanceUsd: number) => {
+      if (isProcessing) return;
+
+      setIsProcessing(true);
+      try {
+        const result = await awardBalanceMilestoneMutation.mutateAsync({
+          userId,
+          currentBalanceUsd,
+        });
+        return result;
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [awardBalanceMilestoneMutation, isProcessing]
+  );
+
+  const awardReferralBonus = useCallback(
+    async (userId: string, totalSuccessfulReferrals: number) => {
+      if (isProcessing) return;
+
+      setIsProcessing(true);
+      try {
+        const result = await awardReferralBonusMutation.mutateAsync({
+          userId,
+          totalSuccessfulReferrals,
+        });
+        return result;
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [awardReferralBonusMutation, isProcessing]
+  );
 
   return {
     awardDepositPoints,
     awardBalanceMilestone,
     awardReferralBonus,
     isProcessing,
-    isLoading: awardDepositPointsMutation.isPending || awardBalanceMilestoneMutation.isPending || awardReferralBonusMutation.isPending,
-    error: awardDepositPointsMutation.error || awardBalanceMilestoneMutation.error || awardReferralBonusMutation.error,
+    isLoading:
+      awardDepositPointsMutation.isPending ||
+      awardBalanceMilestoneMutation.isPending ||
+      awardReferralBonusMutation.isPending,
+    error:
+      awardDepositPointsMutation.error ??
+      awardBalanceMilestoneMutation.error ??
+      awardReferralBonusMutation.error,
   };
 };

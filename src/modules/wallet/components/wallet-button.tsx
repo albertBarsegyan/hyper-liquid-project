@@ -1,8 +1,13 @@
 import React from 'react';
 import { useWalletContext } from '@/modules/wallet';
 import { HYPER_EVM_CONFIG } from '../types';
+import { useSearchParams } from 'react-router-dom';
 
 const WalletButton: React.FC = () => {
+  const [searchParams] = useSearchParams();
+
+  const referredAddress = searchParams.get('referred');
+
   const {
     isConnected,
     account,
@@ -114,7 +119,7 @@ const WalletButton: React.FC = () => {
   return (
     <div className="flex flex-col gap-2">
       <button
-        onClick={connect}
+        onClick={() => connect(referredAddress)}
         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
       >
         Connect MetaMask

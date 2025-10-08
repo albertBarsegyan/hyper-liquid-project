@@ -237,7 +237,6 @@ src/modules/referral/
 │   └── referral.tsx             # React hooks
 ├── components/
 │   ├── referral-code-display.tsx
-│   ├── referral-stats.tsx
 │   ├── referral-input.tsx
 │   └── referral-integration-example.tsx
 ├── index.ts                     # Main exports
