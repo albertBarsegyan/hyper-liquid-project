@@ -14,8 +14,13 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useWalletContext } from '@/modules/wallet';
+import { useSearchParams } from 'react-router-dom';
 
 const WalletConnectButton: React.FC = () => {
+  const [searchParams] = useSearchParams();
+
+  const referredAddress = searchParams.get('referred');
+
   const {
     isConnected,
     account,
@@ -216,7 +221,7 @@ const WalletConnectButton: React.FC = () => {
   return (
     <div className="flex flex-col space-y-3">
       <Button
-        onClick={connect}
+        onClick={() => connect(referredAddress)}
         className="w-full sm:w-auto h-12 text-responsive-base"
         style={{
           backgroundColor: '#97fce4',

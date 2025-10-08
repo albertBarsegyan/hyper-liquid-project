@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import { Carousel } from '@/components/ui/carousel';
 
-// Import background images
 import bg1 from '@/assets/images/bg-1.jpg';
 import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
