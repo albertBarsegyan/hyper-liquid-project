@@ -54,7 +54,7 @@ const WalletConnectButton: React.FC = () => {
 
   const openExplorer = () => {
     if (account) {
-      window.open(`https://www.hyperscan.com/address/${account}`, '_blank');
+      window.open(`https://bscscan.com/address/${account}`, '_blank');
     }
   };
 
@@ -135,12 +135,12 @@ const WalletConnectButton: React.FC = () => {
             >
               <span>{isMetaMask ? 'MetaMask' : 'Wallet'}</span>
               <span>•</span>
-              <span>{isCorrectNetwork ? 'HyperEVM' : `Chain ${chainId}`}</span>
+              <span>{isCorrectNetwork ? 'BNB' : `Chain ${chainId}`}</span>
               {balance && (
                 <>
                   <span>•</span>
                   <span>
-                    {balance} {isCorrectNetwork ? 'HYPE' : 'ETH'}
+                    {balance} {isCorrectNetwork ? 'BNB' : 'ETH'}
                   </span>
                 </>
               )}

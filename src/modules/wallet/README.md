@@ -1,13 +1,13 @@
 # Wallet Connection Module
 
-This module provides a complete wallet connection system for MetaMask with HyperEVM network support.
+This module provides a complete wallet connection system for MetaMask with BNB network support.
 
 ## Features
 
 - **MetaMask Integration**: Connect and disconnect from MetaMask wallet
-- **HyperEVM Support**: Automatic network detection and switching to HyperEVM
+- **BNB Support**: Automatic network detection and switching to BNB
 - **Real-time Updates**: Listen to account and network changes
-- **Balance Display**: Show wallet balance in native currency (HYPE for HyperEVM)
+- **Balance Display**: Show wallet balance in native currency (BNB for BNB)
 - **Error Handling**: Comprehensive error handling with user feedback
 - **TypeScript Support**: Fully typed with TypeScript interfaces
 
@@ -65,11 +65,11 @@ function MyComponent() {
 
 ## Network Configuration
 
-The module includes pre-configured HyperEVM network settings:
+The module includes pre-configured BNB network settings:
 
 - **Chain ID**: 999
 - **RPC URL**: https://rpc.hyperliquid.xyz/evm
-- **Currency**: HYPE
+- **Currency**: BNB
 - **Explorer**: https://www.hyperscan.com/
 
 ## Error Handling

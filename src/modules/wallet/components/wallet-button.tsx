@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWalletContext } from '@/modules/wallet';
-import { HYPER_EVM_CONFIG } from '../types';
+import { CHAIN_CONFIG } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
 const WalletButton: React.FC = () => {
@@ -28,7 +28,7 @@ const WalletButton: React.FC = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const isHyperEVM = chainId === HYPER_EVM_CONFIG.chainId;
+  const isHyperEVM = chainId === CHAIN_CONFIG.chainId;
 
   if (isConnecting) {
     return (
@@ -65,11 +65,11 @@ const WalletButton: React.FC = () => {
               className={`text-xs ${isCorrectNetwork ? 'text-green-600' : 'text-orange-600'}`}
             >
               {isMetaMask ? 'MetaMask' : 'Wallet'} •{' '}
-              {isHyperEVM ? 'HyperEVM' : `Chain ${chainId}`}
+              {isHyperEVM ? 'BNB' : `Chain ${chainId}`}
             </div>
             {balance && (
               <div className="text-gray-500">
-                {balance} {isHyperEVM ? 'HYPE' : 'ETH'}
+                {balance} {isHyperEVM ? 'BNB' : 'ETH'}
               </div>
             )}
           </div>
@@ -80,7 +80,7 @@ const WalletButton: React.FC = () => {
                 onClick={switchToHyperEVM}
                 className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
               >
-                Switch to HyperEVM
+                Switch to BNB
               </button>
             )}
 

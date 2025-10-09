@@ -3,7 +3,7 @@ import { BrowserProvider, formatEther } from 'ethers';
 import {
   type WalletState,
   type WalletContextType,
-  HYPER_EVM_CONFIG,
+  CHAIN_CONFIG,
 } from '@/modules/wallet/types';
 
 import { localStorageUtil } from '@/modules/shared/utils/local-storage.ts';
@@ -163,7 +163,7 @@ const useWallet = (): WalletContextType => {
 
       const isMetaMask = window.ethereum?.isMetaMask ?? false;
       const chainIdHex = '0x' + network.chainId.toString(16);
-      const isCorrectNetwork = chainIdHex === HYPER_EVM_CONFIG.chainId;
+      const isCorrectNetwork = chainIdHex === CHAIN_CONFIG.chainId;
 
       if (accounts.length > 0) {
         const account = accounts[0].address;
@@ -183,19 +183,17 @@ const useWallet = (): WalletContextType => {
         if (!isCorrectNetwork) {
           try {
             await provider.send('wallet_switchEthereumChain', [
-              { chainId: HYPER_EVM_CONFIG.chainId },
+              { chainId: CHAIN_CONFIG.chainId },
             ]);
           } catch (switchError) {
             const errorCode = getErrorCode(switchError);
             if (errorCode === 4902) {
               try {
-                await provider.send('wallet_addEthereumChain', [
-                  HYPER_EVM_CONFIG,
-                ]);
+                await provider.send('wallet_addEthereumChain', [CHAIN_CONFIG]);
               } catch {
-                setError('Failed to add HyperEVM network');
+                setError('Failed to add BNB network');
               }
-            } else setError('Failed to switch to HyperEVM network:');
+            } else setError('Failed to switch to BNB network:');
           }
         }
 
@@ -233,13 +231,13 @@ const useWallet = (): WalletContextType => {
 
     try {
       await provider.send('wallet_switchEthereumChain', [
-        { chainId: HYPER_EVM_CONFIG.chainId },
+        { chainId: CHAIN_CONFIG.chainId },
       ]);
     } catch (switchError) {
       const errorCode = getErrorCode(switchError);
       if (errorCode === 4902) {
         try {
-          await provider.send('wallet_addEthereumChain', [HYPER_EVM_CONFIG]);
+          await provider.send('wallet_addEthereumChain', [CHAIN_CONFIG]);
         } catch (addError) {
           const addErrorCode = getErrorCode(addError);
           if (addErrorCode === -32002)
@@ -275,7 +273,7 @@ const useWallet = (): WalletContextType => {
         const chainIdHex = '0x' + network.chainId.toString(16);
 
         const isMetaMask = window.ethereum?.isMetaMask ?? false;
-        const isCorrectNetwork = chainIdHex === HYPER_EVM_CONFIG.chainId;
+        const isCorrectNetwork = chainIdHex === CHAIN_CONFIG.chainId;
 
         setState(prev => ({
           ...prev,
@@ -316,7 +314,7 @@ const useWallet = (): WalletContextType => {
           try {
             await switchToHyperEVM();
           } catch {
-            setAuthError('Failed to switch to HyperEVM network');
+            setAuthError('Failed to switch to BNB network');
           }
         }
 
@@ -374,7 +372,7 @@ const useWallet = (): WalletContextType => {
         setState(prev => ({
           ...prev,
           chainId: chainId,
-          isCorrectNetwork: chainId === HYPER_EVM_CONFIG.chainId,
+          isCorrectNetwork: chainId === CHAIN_CONFIG.chainId,
         }));
 
         if (!isManuallyDisconnected()) void checkConnection();
