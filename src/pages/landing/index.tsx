@@ -43,7 +43,8 @@ const LandingPage: React.FC = () => {
                 className="text-responsive-3xl sm:text-responsive-4xl lg:text-6xl capitalise font-bold leading-tight"
                 style={{ color: '#97fce4' }}
               >
-                Decentralized RWA liquidity on HyperEVM
+                Decentralized RWA liquidity on BNB, powered by real-world
+                low-latency data centers.
               </h1>
               <div className="text-responsive-lg sm:text-responsive-xl lg:text-2xl">
                 <Typewriter

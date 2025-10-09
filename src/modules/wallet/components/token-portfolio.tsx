@@ -32,12 +32,12 @@ const TokenPortfolio: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Common ERC-20 tokens on HyperEVM (you can expand this list)
+  // Common ERC-20 tokens on BNB (you can expand this list)
   const commonTokens = [
     {
       address: '0x0000000000000000000000000000000000000000',
-      name: 'HYPE',
-      symbol: 'HYPE',
+      name: 'BNB',
+      symbol: 'BNB',
       decimals: 18,
     },
   ];
@@ -111,7 +111,7 @@ const TokenPortfolio: React.FC = () => {
   };
 
   const openExplorer = (address: string) => {
-    window.open(`https://www.hyperscan.com/token/${address}`, '_blank');
+    window.open(`https://bscscan.com/token/${address}`, '_blank');
   };
 
   useEffect(() => {
@@ -122,7 +122,10 @@ const TokenPortfolio: React.FC = () => {
     return (
       <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
         <CardHeader>
-          <CardTitle className="flex items-center text-responsive-lg" style={{ color: '#97fce4' }}>
+          <CardTitle
+            className="flex items-center text-responsive-lg"
+            style={{ color: '#97fce4' }}
+          >
             <Coins className="mr-2 h-5 w-5" />
             Token Portfolio
           </CardTitle>
@@ -143,19 +146,22 @@ const TokenPortfolio: React.FC = () => {
     <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle className="flex items-center text-responsive-lg" style={{ color: '#97fce4' }}>
+          <CardTitle
+            className="flex items-center text-responsive-lg"
+            style={{ color: '#97fce4' }}
+          >
             <Coins className="mr-2 h-5 w-5" />
             Token Portfolio
           </CardTitle>
-          <Button 
-            onClick={fetchTokenBalances} 
-            disabled={loading} 
+          <Button
+            onClick={fetchTokenBalances}
+            disabled={loading}
             size="sm"
             className="w-full sm:w-auto"
             style={{
               backgroundColor: '#97fce4',
               color: '#0e1e27',
-              border: 'none'
+              border: 'none',
             }}
           >
             {loading ? (
@@ -198,19 +204,28 @@ const TokenPortfolio: React.FC = () => {
                 style={{ borderColor: '#97fce4', opacity: 0.3 }}
               >
                 <div className="flex items-center space-x-3">
-                  <div 
+                  <div
                     className="w-10 h-10 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: '#97fce4', opacity: 0.2 }}
                   >
-                    <span className="text-sm font-medium" style={{ color: '#0e1e27' }}>
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: '#0e1e27' }}
+                    >
                       {token.symbol.slice(0, 2)}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-responsive-sm" style={{ color: '#97fce4' }}>
+                    <p
+                      className="font-medium text-responsive-sm"
+                      style={{ color: '#97fce4' }}
+                    >
                       {token.name}
                     </p>
-                    <p className="text-responsive-xs" style={{ color: '#97fce4', opacity: 0.8 }}>
+                    <p
+                      className="text-responsive-xs"
+                      style={{ color: '#97fce4', opacity: 0.8 }}
+                    >
                       {token.symbol}
                     </p>
                   </div>
@@ -218,10 +233,16 @@ const TokenPortfolio: React.FC = () => {
 
                 <div className="flex items-center justify-between sm:justify-end gap-4">
                   <div className="text-right">
-                    <p className="font-medium text-responsive-sm" style={{ color: '#97fce4' }}>
+                    <p
+                      className="font-medium text-responsive-sm"
+                      style={{ color: '#97fce4' }}
+                    >
                       {parseFloat(token.balanceFormatted).toFixed(6)}
                     </p>
-                    <p className="text-responsive-xs" style={{ color: '#97fce4', opacity: 0.8 }}>
+                    <p
+                      className="text-responsive-xs"
+                      style={{ color: '#97fce4', opacity: 0.8 }}
+                    >
                       {token.symbol}
                     </p>
                   </div>

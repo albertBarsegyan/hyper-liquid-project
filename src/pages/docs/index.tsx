@@ -31,10 +31,10 @@ const DocsPage: React.FC = () => {
         <div className="space-y-6">
           <div>
             <h3 className="text-xl font-semibold text-white mb-3">
-              Welcome to HyperEVM
+              Welcome to BNB
             </h3>
             <p className="text-gray-300 leading-relaxed">
-              HyperEVM is a decentralized platform for Real World Assets (RWA)
+              BNB is a decentralized platform for Real World Assets (RWA)
               liquidity on the HyperLiquid network. Connect your wallet and
               start earning rewards through our Genesis Campaign.
             </p>

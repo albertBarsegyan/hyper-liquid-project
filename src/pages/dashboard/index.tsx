@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx';
-import { HYPER_EVM_CONFIG, useWalletContext } from '@/modules/wallet';
+import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
 
 import {
   Wallet,
@@ -53,7 +53,7 @@ const DashboardPage: React.FC = () => {
 
   const openExplorer = () => {
     if (account) {
-      window.open(`https://hyperscan.com/address/${account}`, '_blank');
+      window.open(`https://bscscan.com/address/${account}`, '_blank');
     }
   };
 
@@ -132,8 +132,8 @@ const DashboardPage: React.FC = () => {
         >
           <AlertTriangle className="h-4 w-4" style={{ color: '#ff6b6b' }} />
           <AlertDescription style={{ color: '#ff6b6b' }}>
-            You're connected to the wrong network. Please switch to HyperEVM for
-            full functionality.
+            You're connected to the wrong network. Please switch to BNB for full
+            functionality.
           </AlertDescription>
         </Alert>
       )}
@@ -213,7 +213,7 @@ const DashboardPage: React.FC = () => {
                     className="text-lg font-semibold"
                     style={{ color: '#97fce4' }}
                   >
-                    {isCorrectNetwork ? 'HyperEVM' : `Chain ${chainId}`}
+                    {isCorrectNetwork ? 'BNB' : `Chain ${chainId}`}
                   </p>
                 </div>
                 <div
@@ -290,7 +290,7 @@ const DashboardPage: React.FC = () => {
                   className="text-4xl font-bold mb-2"
                   style={{ color: '#97fce4' }}
                 >
-                  {balance} {isCorrectNetwork ? 'HYPE' : 'ETH'}
+                  {balance} {isCorrectNetwork ? 'BNB' : 'ETH'}
                 </div>
                 <p style={{ color: '#97fce4', opacity: 0.8 }}>
                   Available Balance
@@ -436,9 +436,7 @@ const DashboardPage: React.FC = () => {
           {/* Network Info */}
           <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
             <CardHeader>
-              <CardTitle style={{ color: '#97fce4' }}>
-                HyperEVM Network
-              </CardTitle>
+              <CardTitle style={{ color: '#97fce4' }}>BNB Network</CardTitle>
               <p style={{ color: '#97fce4', opacity: 0.8 }}>
                 Network configuration details
               </p>
@@ -447,27 +445,27 @@ const DashboardPage: React.FC = () => {
               <div className="flex justify-between">
                 <span style={{ color: '#97fce4', opacity: 0.8 }}>Chain ID</span>
                 <span className="font-mono" style={{ color: '#97fce4' }}>
-                  {HYPER_EVM_CONFIG.chainId}
+                  {CHAIN_CONFIG.chainId}
                 </span>
               </div>
 
               <div className="flex justify-between">
                 <span style={{ color: '#97fce4', opacity: 0.8 }}>Currency</span>
                 <span style={{ color: '#97fce4' }}>
-                  {HYPER_EVM_CONFIG.nativeCurrency.name}
+                  {CHAIN_CONFIG.nativeCurrency.name}
                 </span>
               </div>
 
               <div className="flex justify-between">
                 <span style={{ color: '#97fce4', opacity: 0.8 }}>Explorer</span>
                 <a
-                  href={HYPER_EVM_CONFIG.blockExplorerUrls?.[0] ?? ''}
+                  href={CHAIN_CONFIG.blockExplorerUrls?.[0] ?? ''}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"
                   style={{ color: '#97fce4' }}
                 >
-                  Hyperscan
+                  Bscscan
                 </a>
               </div>
             </CardContent>

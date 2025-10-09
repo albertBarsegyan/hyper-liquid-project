@@ -8,11 +8,17 @@ const SendPage: React.FC = () => {
     <div className="container-responsive py-responsive min-h-full">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-responsive-3xl font-bold mb-2" style={{ color: '#97fce4' }}>
+          <h1
+            className="text-responsive-3xl font-bold mb-2"
+            style={{ color: '#97fce4' }}
+          >
             Send
           </h1>
-          <p className="text-responsive-base" style={{ color: '#97fce4', opacity: 0.8 }}>
-            Send tokens to any address on the HyperEVM network
+          <p
+            className="text-responsive-base"
+            style={{ color: '#97fce4', opacity: 0.8 }}
+          >
+            Send tokens to any address on the BNB network
           </p>
         </div>
 
@@ -74,7 +80,7 @@ const SendPage: React.FC = () => {
                     height: '50px',
                   }}
                 >
-                  HYPE
+                  BNB
                 </Button>
               </div>
             </div>

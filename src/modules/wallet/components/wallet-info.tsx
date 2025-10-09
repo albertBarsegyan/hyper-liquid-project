@@ -1,5 +1,5 @@
 import React from 'react';
-import { HYPER_EVM_CONFIG, useWalletContext } from '@/modules/wallet';
+import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
 
 const WalletInfo: React.FC = () => {
   const {
@@ -45,7 +45,7 @@ const WalletInfo: React.FC = () => {
     );
   }
 
-  const isHyperEVM = String(chainId) === HYPER_EVM_CONFIG.chainId;
+  const isHyperEVM = String(chainId) === CHAIN_CONFIG.chainId;
   const statusColor = isCorrectNetwork ? '#97fce4' : '#ff6b6b';
   const statusText = isCorrectNetwork ? 'Connected' : 'Wrong Network';
 
@@ -95,7 +95,7 @@ const WalletInfo: React.FC = () => {
             Network:
           </span>{' '}
           <span style={{ color: statusColor }}>
-            {isHyperEVM ? 'HyperEVM Mainnet' : `Chain ${chainId}`}
+            {isHyperEVM ? 'BNB Mainnet' : `Chain ${chainId}`}
           </span>
         </div>
         <div>
@@ -103,7 +103,7 @@ const WalletInfo: React.FC = () => {
             Balance:
           </span>{' '}
           <span style={{ color: '#97fce4', opacity: 0.8 }}>
-            {balance} {isHyperEVM ? 'HYPE' : 'ETH'}
+            {balance} {isHyperEVM ? 'BNB' : 'ETH'}
           </span>
         </div>
         <div>
@@ -123,7 +123,7 @@ const WalletInfo: React.FC = () => {
               color: '#ff6b6b',
             }}
           >
-            ⚠️ Please switch to HyperEVM network for full functionality
+            ⚠️ Please switch to BNB network for full functionality
           </div>
         )}
       </div>

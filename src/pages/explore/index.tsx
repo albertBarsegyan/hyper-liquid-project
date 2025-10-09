@@ -15,7 +15,7 @@ const ExplorePage: React.FC = () => {
   const exploreItems = [
     {
       title: 'Top Tokens',
-      description: 'Discover trending tokens on HyperEVM',
+      description: 'Discover trending tokens on BNB',
       icon: TrendingUp,
       color: '#97fce4',
     },
@@ -43,11 +43,17 @@ const ExplorePage: React.FC = () => {
     <div className="container-responsive py-responsive min-h-full">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-responsive-3xl font-bold mb-2" style={{ color: '#97fce4' }}>
+          <h1
+            className="text-responsive-3xl font-bold mb-2"
+            style={{ color: '#97fce4' }}
+          >
             Explore
           </h1>
-          <p className="text-responsive-base" style={{ color: '#97fce4', opacity: 0.8 }}>
-            Discover the HyperEVM ecosystem and find new opportunities
+          <p
+            className="text-responsive-base"
+            style={{ color: '#97fce4', opacity: 0.8 }}
+          >
+            Discover the BNB ecosystem and find new opportunities
           </p>
         </div>
 
@@ -130,7 +136,10 @@ const ExplorePage: React.FC = () => {
 
         {/* Trending Section */}
         <div className="mt-12">
-          <h2 className="text-responsive-2xl font-bold mb-6" style={{ color: '#97fce4' }}>
+          <h2
+            className="text-responsive-2xl font-bold mb-6"
+            style={{ color: '#97fce4' }}
+          >
             Trending
           </h2>
           <div className="grid-responsive-3 gap-6">

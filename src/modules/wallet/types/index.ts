@@ -33,14 +33,14 @@ export interface WalletContextType extends WalletState {
   loading: boolean;
 }
 
-export const HYPER_EVM_CONFIG: AddEthereumChainParameter = {
-  chainId: '0x3e7', // hexadecimal of 999 decimal
-  chainName: 'HyperEVM Mainnet',
-  rpcUrls: ['https://rpc.hyperliquid.xyz/evm'],
-  blockExplorerUrls: ['https://explorer.hyperliquid.xyz/'], // or whichever explorer url is correct
+export const CHAIN_CONFIG: AddEthereumChainParameter = {
+  chainId: '0x38', // 56 in decimal
+  chainName: 'Binance Smart Chain Mainnet',
+  rpcUrls: ['https://bsc-dataseed.binance.org/'],
+  blockExplorerUrls: ['https://bscscan.com/'],
   nativeCurrency: {
-    name: 'HYPE',
-    symbol: 'HYPE',
+    name: 'BNB',
+    symbol: 'BNB',
     decimals: 18,
   },
 };
