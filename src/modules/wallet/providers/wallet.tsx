@@ -25,7 +25,7 @@ const metadata = {
 };
 
 // Get project ID from environment variables
-const PROJECT_ID = import.meta.env.VITE_APP_REOWN_PROJECT_ID as string;
+const PROJECT_ID = import.meta.env.REOWN_PROJECT_ID as string;
 
 if (!PROJECT_ID) {
   console.warn(
