@@ -7,8 +7,8 @@ const WalletInfo: React.FC = () => {
     accountAddress,
     chainId,
     balanceState,
-    isMetaMask,
     isCorrectNetwork,
+    walletInfo,
     error,
   } = useWalletContext();
 
@@ -74,7 +74,7 @@ const WalletInfo: React.FC = () => {
             color: isCorrectNetwork ? '#0e1e27' : '#ffffff',
           }}
         >
-          {isMetaMask ? 'MetaMask' : 'Wallet'}
+          {walletInfo?.name}
         </div>
       </div>
 
@@ -103,7 +103,7 @@ const WalletInfo: React.FC = () => {
             Balance:
           </span>{' '}
           <span style={{ color: '#97fce4', opacity: 0.8 }}>
-            {balanceState} {isHyperEVM ? 'BNB' : 'ETH'}
+            {balanceState?.balance}
           </span>
         </div>
         <div>
