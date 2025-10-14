@@ -3,15 +3,16 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import React from 'react';
 import type { Reward } from '@/pages/rewards';
+import { AdapterBlueprint } from '@reown/appkit/adapters';
 
 interface BalanceDisplayProps {
-  balance: number | string | null;
+  balanceState: AdapterBlueprint.GetBalanceResult | null;
   currency: string;
   achievements: Array<Reward>;
 }
 
 const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
-  balance,
+  balanceState,
   currency,
   achievements,
 }) => {
@@ -45,7 +46,8 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
                     className="text-responsive-2xl font-bold"
                     style={{ color: '#97fce4' }}
                   >
-                    {Number(balance ?? 0).toLocaleString()} {currency}
+                    {Number(balanceState?.balance ?? 0).toLocaleString()}{' '}
+                    {balanceState?.symbol}
                   </p>
                 </div>
               </div>

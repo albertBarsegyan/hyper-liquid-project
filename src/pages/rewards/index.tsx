@@ -4,13 +4,13 @@ import RewardCard from '@/components/rewards/reward-card';
 import BalanceDisplay from '@/components/rewards/balance-display';
 import RewardsHistory from '@/components/rewards/rewards-history';
 import {
-  Trophy,
+  Clock,
+  Coins,
   Star,
   Target,
-  Zap,
-  Coins,
   TrendingUp,
-  Clock,
+  Trophy,
+  Zap,
 } from 'lucide-react';
 import { useWalletContext } from '@/modules/wallet';
 
@@ -111,8 +111,8 @@ const tasks: Task[] = [
 ];
 
 const RewardsPage: React.FC = () => {
-  const { balance } = useWalletContext();
-  console.log('balance', balance);
+  const { balanceState } = useWalletContext();
+  console.log('balance', balanceState);
   return (
     <div className="container-responsive py-responsive">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -133,8 +133,9 @@ const RewardsPage: React.FC = () => {
         </div>
 
         {/* Monthly Rewards Summary */}
+
         <BalanceDisplay
-          balance={balance}
+          balanceState={balanceState}
           currency="DLIQD"
           achievements={achievements}
         />

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useWalletContext } from '@/modules/wallet';
-import { CHAIN_CONFIG } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
 const WalletButton: React.FC = () => {
@@ -10,16 +9,12 @@ const WalletButton: React.FC = () => {
 
   const {
     isConnected,
-    account,
-    chainId,
-    balance,
+    accountAddress,
+    balanceState,
     isConnecting,
     error,
-    isMetaMask,
-    isCorrectNetwork,
     connect,
     disconnect,
-    switchToHyperEVM,
     refreshBalance,
     clearError,
   } = useWalletContext();
@@ -27,8 +22,6 @@ const WalletButton: React.FC = () => {
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
-
-  const isHyperEVM = chainId === CHAIN_CONFIG.chainId;
 
   if (isConnecting) {
     return (
@@ -60,29 +53,24 @@ const WalletButton: React.FC = () => {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
           <div className="text-sm">
-            <div className="font-medium">{formatAddress(account!)}</div>
-            <div
-              className={`text-xs ${isCorrectNetwork ? 'text-green-600' : 'text-orange-600'}`}
-            >
-              {isMetaMask ? 'MetaMask' : 'Wallet'} •{' '}
-              {isHyperEVM ? 'BNB' : `Chain ${chainId}`}
-            </div>
-            {balance && (
+            <div className="font-medium">{formatAddress(accountAddress!)}</div>
+
+            {balanceState && (
               <div className="text-gray-500">
-                {balance} {isHyperEVM ? 'BNB' : 'ETH'}
+                {balanceState?.balance} {balanceState?.symbol}
               </div>
             )}
           </div>
 
           <div className="flex gap-2">
-            {!isCorrectNetwork && (
-              <button
-                onClick={switchToHyperEVM}
-                className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
-              >
-                Switch to BNB
-              </button>
-            )}
+            {/*{!isCorrectNetwork && (*/}
+            {/*  <button*/}
+            {/*    onClick={switchToHyperEVM}*/}
+            {/*    className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"*/}
+            {/*  >*/}
+            {/*    Switch to BNB*/}
+            {/*  </button>*/}
+            {/*)}*/}
 
             <button
               onClick={refreshBalance}

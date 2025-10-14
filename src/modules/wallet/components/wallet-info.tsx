@@ -4,9 +4,9 @@ import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
 const WalletInfo: React.FC = () => {
   const {
     isConnected,
-    account,
+    accountAddress,
     chainId,
-    balance,
+    balanceState,
     isMetaMask,
     isCorrectNetwork,
     error,
@@ -87,7 +87,7 @@ const WalletInfo: React.FC = () => {
             className="font-mono"
             style={{ color: '#97fce4', opacity: 0.8 }}
           >
-            {account}
+            {accountAddress}
           </span>
         </div>
         <div>
@@ -103,7 +103,7 @@ const WalletInfo: React.FC = () => {
             Balance:
           </span>{' '}
           <span style={{ color: '#97fce4', opacity: 0.8 }}>
-            {balance} {isHyperEVM ? 'BNB' : 'ETH'}
+            {balanceState} {isHyperEVM ? 'BNB' : 'ETH'}
           </span>
         </div>
         <div>
