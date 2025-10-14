@@ -11,12 +11,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert.tsx';
 import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
 
 import {
-  Wallet,
+  AlertTriangle,
+  CheckCircle,
   Copy,
   ExternalLink,
   RefreshCw,
-  AlertTriangle,
-  CheckCircle,
+  Wallet,
   XCircle,
 } from 'lucide-react';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
@@ -28,14 +28,14 @@ const generateReferralCode = (address: string): string => {
 const DashboardPage: React.FC = () => {
   const {
     isConnected,
-    account,
+    accountAddress,
     chainId,
-    balance,
-    isMetaMask,
+    balanceState,
     isCorrectNetwork,
     error,
     refreshBalance,
     clearError,
+    walletInfo,
     disconnect,
   } = useWalletContext();
 
@@ -52,8 +52,8 @@ const DashboardPage: React.FC = () => {
   };
 
   const openExplorer = () => {
-    if (account) {
-      window.open(`https://bscscan.com/address/${account}`, '_blank');
+    if (accountAddress) {
+      window.open(`https://bscscan.com/address/${accountAddress}`, '_blank');
     }
   };
 
@@ -66,11 +66,11 @@ const DashboardPage: React.FC = () => {
   if (!isConnected) {
     return (
       <div
-        className="flex items-center justify-center h-full"
+        className="flex items-center justify-center h-full px-4"
         style={{ backgroundColor: '#0e1e27' }}
       >
         <Card
-          className="w-full max-w-md"
+          className="w-full max-w-md "
           style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}
         >
           <CardHeader className="text-center">
@@ -167,14 +167,14 @@ const DashboardPage: React.FC = () => {
                     Address
                   </p>
                   <p className="font-mono text-lg" style={{ color: '#97fce4' }}>
-                    {formatAddress(account!)}
+                    {formatAddress(accountAddress!)}
                   </p>
                 </div>
                 <div className="flex space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(account!)}
+                    onClick={() => copyToClipboard(accountAddress!)}
                     style={{
                       borderColor: '#97fce4',
                       color: '#97fce4',
@@ -230,7 +230,7 @@ const DashboardPage: React.FC = () => {
                     className="text-lg font-semibold"
                     style={{ color: '#97fce4' }}
                   >
-                    {isMetaMask ? 'MetaMask' : 'Other'}
+                    {walletInfo?.name}
                   </p>
                 </div>
               </div>
@@ -250,7 +250,7 @@ const DashboardPage: React.FC = () => {
                     className="text-lg font-semibold"
                     style={{ color: '#97fce4' }}
                   >
-                    {formatAddress(account!)}
+                    {formatAddress(accountAddress!)}
                   </p>
                 </div>
 
@@ -259,7 +259,7 @@ const DashboardPage: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      copyToClipboard(generateReferralCode(account!))
+                      copyToClipboard(generateReferralCode(accountAddress!))
                     }
                     style={{
                       borderColor: '#97fce4',
@@ -290,7 +290,7 @@ const DashboardPage: React.FC = () => {
                   className="text-4xl font-bold mb-2"
                   style={{ color: '#97fce4' }}
                 >
-                  {balance} {isCorrectNetwork ? 'BNB' : 'ETH'}
+                  {balanceState?.balance} {balanceState?.symbol}
                 </div>
                 <p style={{ color: '#97fce4', opacity: 0.8 }}>
                   Available Balance
@@ -366,7 +366,7 @@ const DashboardPage: React.FC = () => {
                       color: '#0e1e27',
                     }}
                   >
-                    {isMetaMask ? 'MetaMask' : 'Other'}
+                    {walletInfo?.name}
                   </Badge>
                 </div>
               </div>
@@ -408,7 +408,7 @@ const DashboardPage: React.FC = () => {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => copyToClipboard(account!)}
+                onClick={() => copyToClipboard(accountAddress!)}
                 style={{
                   borderColor: '#97fce4',
                   color: '#97fce4',

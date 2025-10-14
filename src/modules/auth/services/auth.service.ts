@@ -61,19 +61,6 @@ export const authService = {
   },
 
   /**
-   * Sign message with wallet (MetaMask)
-   */
-  signMessage: async (message: string, address: string): Promise<string> => {
-    if (!window.ethereum) throw new Error('MetaMask not installed');
-    const walletSign = await window.ethereum.request({
-      method: 'personal_sign',
-      params: [message, address],
-    });
-
-    return String(walletSign) as string;
-  },
-
-  /**
    * Verify signature and get token
    */
   verifySignature: async ({

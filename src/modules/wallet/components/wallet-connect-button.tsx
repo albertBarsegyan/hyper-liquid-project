@@ -4,14 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 import {
-  Wallet,
-  Copy,
-  ExternalLink,
-  RefreshCw,
   AlertTriangle,
   CheckCircle,
-  XCircle,
+  Copy,
+  ExternalLink,
   Loader2,
+  RefreshCw,
+  Wallet,
+  XCircle,
 } from 'lucide-react';
 import { useWalletContext } from '@/modules/wallet';
 import { useSearchParams } from 'react-router-dom';
@@ -23,16 +23,13 @@ const WalletConnectButton: React.FC = () => {
 
   const {
     isConnected,
-    account,
-    chainId,
-    balance,
+    accountAddress,
+    balanceState,
     isConnecting,
     error,
-    isMetaMask,
     isCorrectNetwork,
     connect,
     disconnect,
-    switchToHyperEVM,
     refreshBalance,
     clearError,
     // Unified authentication state
@@ -53,8 +50,8 @@ const WalletConnectButton: React.FC = () => {
   };
 
   const openExplorer = () => {
-    if (account) {
-      window.open(`https://bscscan.com/address/${account}`, '_blank');
+    if (accountAddress) {
+      window.open(`https://bscscan.com/address/${accountAddress}`, '_blank');
     }
   };
 
@@ -97,7 +94,6 @@ const WalletConnectButton: React.FC = () => {
           </Alert>
         )}
 
-        {/* Wallet Info */}
         <div
           className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 p-4 border rounded-lg"
           style={{
@@ -112,7 +108,7 @@ const WalletConnectButton: React.FC = () => {
                 className="font-medium text-responsive-sm"
                 style={{ color: '#97fce4' }}
               >
-                {formatAddress(account!)}
+                {formatAddress(accountAddress!)}
               </span>
               <Badge
                 className="text-responsive-xs w-fit"
@@ -133,16 +129,10 @@ const WalletConnectButton: React.FC = () => {
               className="flex flex-wrap items-center gap-2 text-responsive-xs mt-2"
               style={{ color: '#97fce4', opacity: 0.7 }}
             >
-              <span>{isMetaMask ? 'MetaMask' : 'Wallet'}</span>
-              <span>•</span>
-              <span>{isCorrectNetwork ? 'BNB' : `Chain ${chainId}`}</span>
-              {balance && (
-                <>
-                  <span>•</span>
-                  <span>
-                    {balance} {isCorrectNetwork ? 'BNB' : 'ETH'}
-                  </span>
-                </>
+              {balanceState && (
+                <span>
+                  {balanceState?.balance} {balanceState?.symbol}
+                </span>
               )}
               <span>•</span>
               <span style={{ color: isAuthenticated ? '#97fce4' : '#ff6b6b' }}>
@@ -152,21 +142,21 @@ const WalletConnectButton: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {!isCorrectNetwork && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={switchToHyperEVM}
-                className="h-9 px-3 text-responsive-xs"
-                style={{
-                  borderColor: '#97fce4',
-                  color: '#97fce4',
-                  backgroundColor: 'transparent',
-                }}
-              >
-                Switch
-              </Button>
-            )}
+            {/*{!isCorrectNetwork && (*/}
+            {/*  <Button*/}
+            {/*    variant="outline"*/}
+            {/*    size="sm"*/}
+            {/*    onClick={switchToHyperEVM}*/}
+            {/*    className="h-9 px-3 text-responsive-xs"*/}
+            {/*    style={{*/}
+            {/*      borderColor: '#97fce4',*/}
+            {/*      color: '#97fce4',*/}
+            {/*      backgroundColor: 'transparent',*/}
+            {/*    }}*/}
+            {/*  >*/}
+            {/*    Switch*/}
+            {/*  </Button>*/}
+            {/*)}*/}
 
             <Button
               variant="ghost"
@@ -181,7 +171,7 @@ const WalletConnectButton: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(account!)}
+              onClick={() => copyToClipboard(accountAddress!)}
               className="h-9 w-9 p-0 touch-target"
               style={{ color: '#97fce4' }}
             >

@@ -1,17 +1,7 @@
 import type { AddEthereumChainParameter } from '@/types/etherium.ts';
-import type { BrowserProvider } from 'ethers';
 import type { AuthUser } from '@/modules/auth/services/auth.service.ts';
-
-export interface WalletState {
-  isConnected: boolean;
-  account: string | null;
-  chainId: string | null;
-  balance: string | null;
-  isConnecting: boolean;
-  error: string | null;
-  isMetaMask: boolean;
-  isCorrectNetwork: boolean;
-}
+import type { AdapterBlueprint } from '@reown/appkit/adapters';
+import type { ConnectedWalletInfo } from '@reown/appkit';
 
 export interface WalletError extends Error {
   code: number;
@@ -19,18 +9,24 @@ export interface WalletError extends Error {
   data?: unknown;
 }
 
-export interface WalletContextType extends WalletState {
+export interface WalletContextType {
+  isConnected: boolean;
+  accountAddress: string | undefined;
+  isCorrectNetwork: boolean;
+  chainId: string | number | undefined;
+  balanceState: AdapterBlueprint.GetBalanceResult | null;
+  isConnecting: boolean;
+  error: string | null;
   connect: (referredAddress?: string | null) => Promise<void>;
   disconnect: () => void;
-  switchToHyperEVM: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   clearError: () => void;
-  getProvider: () => BrowserProvider | null;
-  // Unified authentication state
   authUser: AuthUser | null;
   isAuthenticated: boolean;
   authError: string | null;
   loading: boolean;
+  switchToCorrectNetwork: VoidFunction;
+  walletInfo: ConnectedWalletInfo | undefined;
 }
 
 export const CHAIN_CONFIG: AddEthereumChainParameter = {

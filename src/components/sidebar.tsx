@@ -1,8 +1,8 @@
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { innerRoutePath } from '@/modules/shared/utils/route';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
-import { Home, Send, User, X, Trophy, Activity } from 'lucide-react';
+import { Activity, Home, Send, Trophy, User, X } from 'lucide-react';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { clsx } from 'clsx';
 
@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { account, isConnected } = useWalletContext();
+  const { accountAddress, isConnected } = useWalletContext();
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -137,7 +137,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Account Section */}
         <div className="p-4 border-t" style={{ borderColor: '#97fce4' }}>
           <Button
-            onClick={() => navigate(innerRoutePath.getMain())}
+            onClick={() => {
+              navigate(innerRoutePath.getMain());
+            }}
             className="w-full h-12 px-4 rounded-lg"
             style={{
               backgroundColor: '#021e17',
@@ -148,9 +150,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             <User className="h-5 w-5 mr-3" />
             <div className="flex flex-col items-start">
               <span className="font-medium">Account</span>
-              {isConnected && account && (
+              {isConnected && accountAddress && (
                 <span className="text-xs opacity-70">
-                  {formatAddress(account)}
+                  {formatAddress(accountAddress)}
                 </span>
               )}
             </div>
