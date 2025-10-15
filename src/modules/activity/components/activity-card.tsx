@@ -1,17 +1,22 @@
-import React from 'react';
-import { ActivityAvatar } from './activity-avatar';
+import React, { lazy, Suspense } from 'react';
 import type { ActivityItem } from '@/modules/activity/types';
+import { FullScreenLoader } from '@/modules/shared/components/loader';
+
+// Lazy load ActivityAvatar component
+const ActivityAvatar = lazy(() => import('./activity-avatar'));
 
 interface ActivityCardProps {
   activity: ActivityItem;
 }
 
-export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
+const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
   const formatTimeAgo = (timestamp: string): string => {
     const now = new Date();
     const activityDate = new Date(timestamp);
-    const diffInDays = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffInDays = Math.floor(
+      (now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffInDays === 0) return 'Today';
     if (diffInDays === 1) return '1 day ago';
     return `${diffInDays} days ago`;
@@ -21,13 +26,19 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
     <div className="bg-gray-800/50 rounded-xl p-4 flex items-center gap-4 hover:bg-gray-800/70 transition-colors">
       {/* Avatar/Icon */}
       <div className="flex-shrink-0">
-        <ActivityAvatar
-          type={activity.icon?.type || 'avatar'}
-          background={activity.icon?.background}
-          text={activity.icon?.text}
-          symbol={activity.icon?.symbol}
-          isReceived={activity.type === 'received'}
-        />
+        <Suspense
+          fallback={
+            <FullScreenLoader variant="normal" message="Loading avatar..." />
+          }
+        >
+          <ActivityAvatar
+            type={activity.icon?.type || 'avatar'}
+            background={activity.icon?.background}
+            text={activity.icon?.text}
+            symbol={activity.icon?.symbol}
+            isReceived={activity.type === 'received'}
+          />
+        </Suspense>
       </div>
 
       {/* Content */}
@@ -40,13 +51,13 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
             <span className="text-white font-semibold">{activity.title}</span>
           )}
         </div>
-        
+
         {activity.description && (
           <div className="text-gray-400 text-sm mt-1">
             {activity.description}
           </div>
         )}
-        
+
         <div className="text-gray-400 text-sm mt-1">
           {formatTimeAgo(activity.timestamp)}
         </div>
@@ -61,3 +72,5 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
     </div>
   );
 };
+
+export default ActivityCard;

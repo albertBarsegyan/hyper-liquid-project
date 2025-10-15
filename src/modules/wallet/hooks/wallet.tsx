@@ -21,9 +21,6 @@ import {
 } from '@/modules/auth/services/auth.service.ts';
 import { responseMessage } from '@/modules/shared/constants/app-messages.ts';
 
-const DISCONNECT_STATE_KEY = 'wallet_disconnect_state';
-const WALLET_ACCOUNT_KEY = 'wallet_last_account';
-
 export const useWallet = (): WalletContextType => {
   const { open } = useAppKit();
   const { address, isConnected, status } = useAppKitAccount();
@@ -42,16 +39,13 @@ export const useWallet = (): WalletContextType => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const isMounted = useRef(true);
-  const hasConnectedOnce = useRef(false);
-  const authInitialized = useRef(false);
-  const addressRef = useRef<string | undefined>(undefined);
+  const isMountedRef = useRef(true);
+  const hasConnectedOnceRef = useRef(false);
+  const authInitializedRef = useRef(false);
   const authUserRef = useRef<AuthUser | null>(null);
   const walletProviderRef = useRef(walletProvider);
-
-  useEffect(() => {
-    addressRef.current = address;
-  }, [address]);
+  const authInProgressRef = useRef(false);
+  const isDisconnectedRef = useRef(false);
 
   useEffect(() => {
     authUserRef.current = authUser;
@@ -61,38 +55,11 @@ export const useWallet = (): WalletContextType => {
     walletProviderRef.current = walletProvider;
   }, [walletProvider]);
 
-  // ---------------------------------------------
-  // Computed Values
-  // ---------------------------------------------
   const isCorrectNetwork = useMemo(() => {
     if (!chainId) return false;
     const targetChainId = parseInt(CHAIN_CONFIG.chainId, 16);
     return chainId === targetChainId;
   }, [chainId]);
-
-  // ---------------------------------------------
-  // Utilities (stable callbacks)
-  // ---------------------------------------------
-  const setDisconnectState = useCallback((disconnected: boolean) => {
-    if (disconnected) {
-      localStorageUtil.setItem(DISCONNECT_STATE_KEY, 'true');
-    } else {
-      localStorageUtil.deleteItem(DISCONNECT_STATE_KEY);
-    }
-  }, []);
-
-  const setLastAccount = useCallback((account: string | null) => {
-    if (account) {
-      localStorageUtil.setItem(WALLET_ACCOUNT_KEY, account);
-    } else {
-      localStorageUtil.deleteItem(WALLET_ACCOUNT_KEY);
-    }
-  }, []);
-
-  const wasManuallyDisconnected = useCallback(
-    (): boolean => localStorageUtil.getItem(DISCONNECT_STATE_KEY) === 'true',
-    []
-  );
 
   const clearError = useCallback(() => {
     setAuthError(null);
@@ -101,7 +68,6 @@ export const useWallet = (): WalletContextType => {
 
   const setError = useCallback(
     (_: unknown, source: 'wallet' | 'auth' = 'wallet') => {
-      // const message = getErrorMessage(error);
       if (source === 'wallet') {
         setWalletError(responseMessage.WENT_WRONG);
       } else {
@@ -117,11 +83,10 @@ export const useWallet = (): WalletContextType => {
   const refreshBalance = useCallback(async () => {
     try {
       const fetchedBalance = await fetchBalance();
-      if (fetchedBalance?.data && isMounted.current) {
+      if (fetchedBalance?.data && isMountedRef.current) {
         setBalance(fetchedBalance.data);
       }
     } catch (error) {
-      console.error('Balance fetch failed:', error);
       setError(error, 'wallet');
     }
   }, [fetchBalance, setError]);
@@ -134,100 +99,133 @@ export const useWallet = (): WalletContextType => {
 
   const connectToServer = useCallback(async () => {
     const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
-    const currentAddress = addressRef.current;
     const currentAuthUser = authUserRef.current;
     const currentWalletProvider = walletProviderRef.current;
 
     if (
-      !currentAddress ||
+      !address ||
       token ||
       !currentWalletProvider ||
       Boolean(currentAuthUser) ||
-      !isMounted.current ||
-      wasManuallyDisconnected()
-    )
+      !isMountedRef.current
+    ) {
       return;
+    }
 
-    setDisconnectState(false);
     setIsConnecting(true);
+    authInProgressRef.current = true;
 
     try {
-      const nonce = await authService.requestNonce(currentAddress);
+      // Step 1: Request nonce
+      const nonce = await authService.requestNonce(address as string);
+
+      // Step 2: Sign message
       const provider = new BrowserProvider(
         currentWalletProvider as Eip1193Provider
       );
+
       const signer = await provider.getSigner();
       const signature = await signer.signMessage(nonce);
 
+      // Verify address hasn't changed after user interaction
+
+      // Step 3: Verify signature
       const { access_token } = await authService.verifySignature({
-        address: currentAddress,
+        address,
         signature,
       });
-      if (!access_token) throw new Error('No access token received');
+
+      if (!access_token) {
+        setAuthError('No access token received');
+        return;
+      }
 
       localStorageUtil.setItem(storageName.AUTH_TOKEN, access_token);
 
+      // Step 4: Get profile BEFORE saving token to ensure consistency
       const profile = await authService.getProfile();
-      if (isMounted.current) {
-        setAuthUser(profile);
-        await refreshBalance();
+
+      if (!profile) {
+        setAuthError('Failed to fetch user profile');
       }
+
+      // Only save token after successful profile fetch
+
+      // Update state if still mounted and address matches
+
+      hasConnectedOnceRef.current = true;
+
+      setAuthUser(profile);
+      await refreshBalance();
     } catch (error) {
-      if (isMounted.current) setError(error, 'auth');
+      // Clean up any partial authentication state
+      localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+
+      if (isMountedRef.current) {
+        // Check if user rejected the signature request
+        setError(error, 'auth');
+
+        // Reset connection flag to allow retry
+        hasConnectedOnceRef.current = false;
+      }
     } finally {
-      if (isMounted.current) setIsConnecting(false);
+      if (isMountedRef.current) setIsConnecting(false);
+
+      authInProgressRef.current = false;
     }
-  }, [wasManuallyDisconnected, setDisconnectState, refreshBalance, setError]);
+  }, [address, refreshBalance, setError]);
 
   const disconnect = useCallback(async () => {
     try {
-      setDisconnectState(true);
-      setLastAccount(null);
-      hasConnectedOnce.current = false;
+      await appKitDisconnect();
+      // Cancel any in-progress authentication
+      authInProgressRef.current = false;
 
+      hasConnectedOnceRef.current = false;
+
+      // Sign out from auth service
       authService.signOut();
 
-      if (isMounted.current) {
+      // Clear local state
+      if (isMountedRef.current) {
         setAuthUser(null);
         setBalance(null);
         clearError();
       }
 
-      await appKitDisconnect();
-    } catch (error) {
-      console.error('Disconnect failed:', error);
-      if (isMounted.current) setError(error, 'wallet');
-    }
-  }, [
-    appKitDisconnect,
-    setDisconnectState,
-    setLastAccount,
-    clearError,
-    setError,
-  ]);
+      // Disconnect from wallet
 
-  // ---------------------------------------------
-  // Effects (optimized dependencies)
-  // ---------------------------------------------
+      isDisconnectedRef.current = true;
+    } catch (error) {
+      isDisconnectedRef.current = false;
+      console.error('Disconnect failed:', error);
+      if (isMountedRef.current) setError(error, 'wallet');
+    }
+  }, [appKitDisconnect, clearError, setError]);
+
   useEffect(() => {
-    isMounted.current = true;
+    isMountedRef.current = true;
     return () => {
-      isMounted.current = false;
+      isMountedRef.current = false;
     };
   }, []);
 
   // Handle initial connection to server
   useEffect(() => {
-    if (address && isConnected && !isConnecting && !hasConnectedOnce.current) {
-      hasConnectedOnce.current = true;
+    if (
+      Boolean(address) &&
+      !isConnecting &&
+      !hasConnectedOnceRef.current &&
+      !authInProgressRef.current
+    ) {
       void connectToServer();
     }
-  }, [address, isConnected, isConnecting, connectToServer]);
+  }, [isConnecting, connectToServer, disconnect, address]);
 
   // Initialize auth on mount
   useEffect(() => {
-    if (!initialized || authInitialized.current) return;
-    authInitialized.current = true;
+    if (!initialized || authInitializedRef.current) return;
+    authInitializedRef.current = true;
 
     const initializeAuth = async () => {
       const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
@@ -240,30 +238,27 @@ export const useWallet = (): WalletContextType => {
         const isValid = await authService.verifyToken();
         if (isValid) {
           const currentUser = await authService.getProfile();
-          if (currentUser && isMounted.current) {
+          if (currentUser && isMountedRef.current) {
             setAuthUser(currentUser);
             await refreshBalance();
+          } else {
+            // Profile fetch failed, clear invalid token
+            localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
           }
         } else {
+          // Token is invalid, remove it
           localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
         }
       } catch (error) {
         console.error('Token verification failed:', error);
         localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
       } finally {
-        if (isMounted.current) setLoading(false);
+        if (isMountedRef.current) setLoading(false);
       }
     };
 
     void initializeAuth();
   }, [initialized, refreshBalance]);
-
-  useEffect(() => {
-    if (isConnected && address) {
-      console.log('isConnected && address');
-      setLastAccount(address);
-    }
-  }, [address, isConnected, chainId, setLastAccount]);
 
   return useMemo(
     (): WalletContextType => ({

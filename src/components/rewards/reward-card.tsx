@@ -1,8 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-
 import { Button } from '@/components/ui/button';
-import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
 interface RewardCardProps {
   id: string;

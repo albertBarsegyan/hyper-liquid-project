@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  ExternalLink,
-  Code,
-  Wallet,
-  Trophy,
   Activity,
+  Code,
+  ExternalLink,
+  Trophy,
   Users,
+  Wallet,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
-import { useWalletContext } from '@/modules/wallet';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 interface DocSection {
   id: string;

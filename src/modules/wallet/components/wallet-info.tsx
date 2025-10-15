@@ -1,5 +1,6 @@
 import React from 'react';
-import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
+import { CHAIN_CONFIG } from '@/modules/wallet/types';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 const WalletInfo: React.FC = () => {
   const {

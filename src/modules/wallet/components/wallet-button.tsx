@@ -1,6 +1,6 @@
 import React from 'react';
-import { useWalletContext } from '@/modules/wallet';
 import { useSearchParams } from 'react-router-dom';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 const WalletButton: React.FC = () => {
   const [searchParams] = useSearchParams();

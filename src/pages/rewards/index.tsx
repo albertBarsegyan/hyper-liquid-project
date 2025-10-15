@@ -12,7 +12,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react';
-import { useWalletContext } from '@/modules/wallet';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 interface Task {
   id: string;
@@ -112,7 +112,7 @@ const tasks: Task[] = [
 
 const RewardsPage: React.FC = () => {
   const { balanceState } = useWalletContext();
-  console.log('balance', balanceState);
+
   return (
     <div className="container-responsive py-responsive">
       <div className="max-w-6xl mx-auto space-y-8">

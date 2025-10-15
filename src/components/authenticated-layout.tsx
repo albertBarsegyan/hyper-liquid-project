@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
-import Sidebar from './sidebar';
+import { FullScreenLoader } from '@/modules/shared/components/loader';
+
+// Lazy load Sidebar component
+const Sidebar = lazy(() => import('./sidebar'));
 
 const AuthenticatedLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,11 +36,13 @@ const AuthenticatedLayout: React.FC = () => {
       </Button>
 
       {/* Mobile Sidebar */}
-      <Sidebar
-        isMobile={true}
-        isOpen={isMobileMenuOpen}
-        onClose={closeMobileMenu}
-      />
+      <Suspense fallback={<FullScreenLoader variant="normal" message="Loading sidebar..." />}>
+        <Sidebar
+          isMobile={true}
+          isOpen={isMobileMenuOpen}
+          onClose={closeMobileMenu}
+        />
+      </Suspense>
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto lg:ml-0">

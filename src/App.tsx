@@ -1,18 +1,26 @@
-import { RouterProvider } from 'react-router-dom';
-
-import { authenticatedRoutes } from '@/routes/authenticated.tsx';
-import { guestRoutes } from '@/routes/guest.tsx';
+import { lazy, Suspense } from 'react';
 import { FullScreenLoader } from '@/modules/shared/components/loader';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
-import { useWalletContext } from '@/modules/wallet';
+// Lazy load the main App component
+const AppContent = lazy(() => import('./AppContent.tsx'));
 
 function App() {
-  const { authUser, loading } = useWalletContext();
+  const { loading } = useWalletContext();
 
   if (loading) return <FullScreenLoader />;
 
   return (
-    <RouterProvider router={authUser ? authenticatedRoutes : guestRoutes} />
+    <Suspense
+      fallback={
+        <FullScreenLoader
+          variant="fullscreen"
+          message="Loading application..."
+        />
+      }
+    >
+      <AppContent />
+    </Suspense>
   );
 }
 
