@@ -7,7 +7,7 @@ import { bsc } from '@/modules/wallet/constants/networks.ts';
 
 import { Buffer } from 'buffer';
 
-global.Buffer = global.Buffer || Buffer;
+window.Buffer = window.Buffer || Buffer;
 
 export const WalletContext = createContext<WalletContextType | undefined>(
   undefined
