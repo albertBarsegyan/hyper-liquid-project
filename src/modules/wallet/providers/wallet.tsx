@@ -21,7 +21,7 @@ const metadata = {
   name: 'DLIQD',
   description: 'Decentralized RWA liquidity on BNB',
   url: 'https://www.dliqd.com/',
-  icons: ['https://www.dliqd.com/favicon.ico'],
+  icons: [`${window.location.origin}/dliqd.png`],
 };
 
 // Get project ID from environment variables

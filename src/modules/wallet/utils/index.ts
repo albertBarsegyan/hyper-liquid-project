@@ -1,13 +1,5 @@
-import type { WalletError } from '@/modules/wallet';
 import { formatEther, formatUnits, parseUnits } from 'ethers';
-
-/**
- * Wallet Utility Functions
- *
- * A comprehensive set of utilities for working with wallets and blockchain data
- */
-
-// ==================== Error Handling ====================
+import type { WalletError } from '@/modules/wallet/types';
 
 export const isWalletError = (error: unknown): error is WalletError => {
   return (

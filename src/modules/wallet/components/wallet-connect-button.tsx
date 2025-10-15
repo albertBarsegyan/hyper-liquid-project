@@ -13,13 +13,12 @@ import {
   Wallet,
   XCircle,
 } from 'lucide-react';
-import { useWalletContext } from '@/modules/wallet';
-import { useSearchParams } from 'react-router-dom';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 const WalletConnectButton: React.FC = () => {
-  const [searchParams] = useSearchParams();
-
-  const referredAddress = searchParams.get('referred');
+  // const [searchParams] = useSearchParams();
+  //
+  // const referredAddress = searchParams.get('referred');
 
   const {
     isConnected,
@@ -32,7 +31,6 @@ const WalletConnectButton: React.FC = () => {
     disconnect,
     refreshBalance,
     clearError,
-    // Unified authentication state
     isAuthenticated,
     authError,
   } = useWalletContext();
@@ -211,7 +209,7 @@ const WalletConnectButton: React.FC = () => {
   return (
     <div className="flex flex-col space-y-3">
       <Button
-        onClick={() => connect(referredAddress)}
+        onClick={() => connect()}
         className="w-full sm:w-auto h-12 text-responsive-base"
         style={{
           backgroundColor: '#97fce4',

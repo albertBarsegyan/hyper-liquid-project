@@ -1,5 +1,5 @@
 import React from 'react';
-import { WalletInfo } from '@/modules/wallet';
+import WalletInfo from '@/modules/wallet/components/wallet-info.tsx';
 
 const Home: React.FC = () => {
   return (

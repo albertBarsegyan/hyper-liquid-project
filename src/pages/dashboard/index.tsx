@@ -8,7 +8,6 @@ import {
 import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx';
-import { CHAIN_CONFIG, useWalletContext } from '@/modules/wallet';
 
 import {
   AlertTriangle,
@@ -20,6 +19,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
+import { CHAIN_CONFIG } from '@/modules/wallet/types';
 
 const generateReferralCode = (address: string): string => {
   return window.location.origin + toQueryString({ referred: address });

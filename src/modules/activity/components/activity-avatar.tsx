@@ -9,7 +9,7 @@ interface ActivityAvatarProps {
   isReceived?: boolean;
 }
 
-export const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
+const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
   type,
   background = '#3B82F6',
   text,
@@ -19,7 +19,7 @@ export const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
   if (type === 'square') {
     return (
       <div className="relative">
-        <div 
+        <div
           className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg"
           style={{ backgroundColor: background }}
         >
@@ -37,12 +37,18 @@ export const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
   return (
     <div className="relative">
       {/* Avatar with crescent moon background */}
-      <div className="w-12 h-12 rounded-full relative overflow-hidden" style={{ backgroundColor: '#1E40AF' }}>
+      <div
+        className="w-12 h-12 rounded-full relative overflow-hidden"
+        style={{ backgroundColor: '#1E40AF' }}
+      >
         {/* Crescent moon background */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full" style={{ backgroundColor: '#FBBF24' }}></div>
+          <div
+            className="w-8 h-8 rounded-full"
+            style={{ backgroundColor: '#FBBF24' }}
+          ></div>
         </div>
-        
+
         {/* Robot/Knight character */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
@@ -50,7 +56,7 @@ export const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
           </div>
         </div>
       </div>
-      
+
       {/* Status indicator */}
       {isReceived && (
         <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
@@ -60,3 +66,5 @@ export const ActivityAvatar: React.FC<ActivityAvatarProps> = ({
     </div>
   );
 };
+
+export default ActivityAvatar;

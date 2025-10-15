@@ -1,12 +1,15 @@
-import React from 'react';
-import { ActivityCard } from './activity-card';
+import React, { lazy, Suspense } from 'react';
 import type { ActivityGroup as ActivityGroupType } from '@/modules/activity/types';
+import { FullScreenLoader } from '@/modules/shared/components/loader';
+
+// Lazy load ActivityCard component
+const ActivityCard = lazy(() => import('./activity-card'));
 
 interface ActivityGroupProps {
   group: ActivityGroupType;
 }
 
-export const ActivityGroup: React.FC<ActivityGroupProps> = ({ group }) => {
+const ActivityGroup: React.FC<ActivityGroupProps> = ({ group }) => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -25,9 +28,21 @@ export const ActivityGroup: React.FC<ActivityGroupProps> = ({ group }) => {
       {/* Activity Cards */}
       <div className="space-y-3">
         {group.activities.map(activity => (
-          <ActivityCard key={activity.id} activity={activity} />
+          <Suspense
+            key={activity.id}
+            fallback={
+              <FullScreenLoader
+                variant="normal"
+                message="Loading activity..."
+              />
+            }
+          >
+            <ActivityCard activity={activity} />
+          </Suspense>
         ))}
       </div>
     </div>
   );
 };
+
+export default ActivityGroup;

@@ -1,12 +1,15 @@
-import React from 'react';
-import { ActivityGroup } from './activity-group';
-import { ActivityEmptyState } from './activity-empty-state';
+import React, { lazy, Suspense } from 'react';
 import { useAuthReferralHistory } from '@/modules/activity/hooks/useAuthReferrals';
+import { FullScreenLoader } from '@/modules/shared/components/loader';
 import type {
   ActivityGroup as ActivityGroupType,
   ActivityItem,
 } from '@/modules/activity/types';
 import type { ReferralHistoryItem } from '@/modules/auth/services/auth.service';
+
+// Lazy load activity components
+const ActivityGroup = lazy(() => import('./activity-group'));
+const ActivityEmptyState = lazy(() => import('./activity-empty-state'));
 
 export const ActivityFeed: React.FC = () => {
   const { data: referralHistory, isLoading, error } = useAuthReferralHistory();
@@ -85,11 +88,17 @@ export const ActivityFeed: React.FC = () => {
 
   if (error) {
     return (
-      <ActivityEmptyState
-        title="Failed to load activity"
-        description="There was an error loading your activity feed. Please try again later."
-        type="error"
-      />
+      <Suspense
+        fallback={
+          <FullScreenLoader variant="normal" message="Loading error state..." />
+        }
+      >
+        <ActivityEmptyState
+          title="Failed to load activity"
+          description="There was an error loading your activity feed. Please try again later."
+          type="error"
+        />
+      </Suspense>
     );
   }
 
@@ -99,18 +108,34 @@ export const ActivityFeed: React.FC = () => {
 
   if (activityData.length === 0) {
     return (
-      <ActivityEmptyState
-        title="No activity yet"
-        description="Your referral activity will appear here once you start referring friends or receive rewards."
-        type="empty"
-      />
+      <Suspense
+        fallback={
+          <FullScreenLoader variant="normal" message="Loading empty state..." />
+        }
+      >
+        <ActivityEmptyState
+          title="No activity yet"
+          description="Your referral activity will appear here once you start referring friends or receive rewards."
+          type="empty"
+        />
+      </Suspense>
     );
   }
 
   return (
     <div className="space-y-8">
       {activityData.map(group => (
-        <ActivityGroup key={group.date} group={group} />
+        <Suspense
+          key={group.date}
+          fallback={
+            <FullScreenLoader
+              variant="normal"
+              message="Loading activity group..."
+            />
+          }
+        >
+          <ActivityGroup group={group} />
+        </Suspense>
       ))}
     </div>
   );

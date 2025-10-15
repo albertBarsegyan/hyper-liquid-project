@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { WalletConnectButton } from '@/modules/wallet';
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link } from 'react-router-dom';
@@ -11,6 +10,7 @@ import bg1 from '@/assets/images/bg-1.jpg';
 import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
 import bg4 from '@/assets/images/bg-5.jpg';
+import WalletConnectButton from '@/modules/wallet/components/wallet-connect-button.tsx';
 
 const LandingPage: React.FC = () => {
   const carouselImages = [bg1, bg2, bg3, bg4];

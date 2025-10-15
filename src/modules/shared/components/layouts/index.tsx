@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { WalletButton } from '@/modules/wallet';
+import { FullScreenLoader } from '@/modules/shared/components/loader';
+
+// Lazy load wallet components
+const WalletButton = lazy(() => import('@/modules/wallet/components/wallet-button.tsx'));
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -46,7 +49,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </nav>
             </div>
 
-            <WalletButton />
+            <Suspense fallback={<FullScreenLoader variant="normal" message="Loading wallet..." />}>
+              <WalletButton />
+            </Suspense>
           </div>
         </div>
       </header>

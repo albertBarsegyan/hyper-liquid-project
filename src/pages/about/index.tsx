@@ -1,5 +1,5 @@
 import React from 'react';
-import { CHAIN_CONFIG } from '@/modules/wallet';
+import { CHAIN_CONFIG } from '@/modules/wallet/types';
 
 const About: React.FC = () => {
   return (

@@ -8,7 +8,7 @@ interface ActivityEmptyStateProps {
   type: 'empty' | 'error';
 }
 
-export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({
+const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({
   title,
   description,
   type,
@@ -81,3 +81,5 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({
     </div>
   );
 };
+
+export default ActivityEmptyState;
