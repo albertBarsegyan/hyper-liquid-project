@@ -3,12 +3,15 @@ import {
   useAuthReferrals,
   useAuthReferrers,
 } from '@/modules/activity/hooks/useAuthReferrals';
-import { Trophy, Users, DollarSign } from 'lucide-react';
+import { DollarSign, Users } from 'lucide-react';
 
 export const ActivityHeader: React.FC = () => {
   const { data: referralStats, isLoading: statsLoading } = useAuthReferrals();
   const { data: referrerStats, isLoading: referrerLoading } =
     useAuthReferrers();
+
+  // const totalReferrals = referralStats?.totalReferrals ?? 0;
+  const totalReferrers = referrerStats?.totalReferrers ?? 0;
 
   const isLoading = statsLoading || referrerLoading;
 
@@ -27,19 +30,7 @@ export const ActivityHeader: React.FC = () => {
                   <div>
                     <p className="text-gray-400 text-sm">Total Referrals</p>
                     <p className="text-white font-semibold text-lg">
-                      {referralStats.totalReferrals}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center gap-3">
-                  <Trophy className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Successful</p>
-                    <p className="text-white font-semibold text-lg">
-                      {referralStats.successfulReferrals ?? 0}
+                      {totalReferrers}
                     </p>
                   </div>
                 </div>
@@ -50,9 +41,7 @@ export const ActivityHeader: React.FC = () => {
                   <DollarSign className="w-5 h-5 text-yellow-400" />
                   <div>
                     <p className="text-gray-400 text-sm">Total Earnings</p>
-                    <p className="text-white font-semibold text-lg">
-                      ${referralStats?.totalEarnings?.toFixed(2)}
-                    </p>
+                    <p className="text-white font-semibold text-lg">0</p>
                   </div>
                 </div>
               </div>
