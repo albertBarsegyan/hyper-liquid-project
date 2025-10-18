@@ -5,7 +5,7 @@ import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 const WalletButton: React.FC = () => {
   const [searchParams] = useSearchParams();
 
-  const referredAddress = searchParams.get('referred');
+  const referredAddress = searchParams.get('referred') ?? undefined;
 
   const {
     isConnected,
@@ -110,7 +110,7 @@ const WalletButton: React.FC = () => {
         onClick={() => connect(referredAddress)}
         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
       >
-        Connect MetaMask
+        Connect Wallet
       </button>
       {error && <div className="text-red-500 text-sm">{error}</div>}
     </div>

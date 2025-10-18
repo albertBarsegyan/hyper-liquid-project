@@ -45,7 +45,7 @@ export const useWallet = (): WalletContextType => {
   const authUserRef = useRef<AuthUser | null>(null);
   const walletProviderRef = useRef(walletProvider);
   const authInProgressRef = useRef(false);
-  const isDisconnectedRef = useRef(false);
+  const referralRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     authUserRef.current = authUser;
@@ -91,11 +91,15 @@ export const useWallet = (): WalletContextType => {
     }
   }, [fetchBalance, setError]);
 
-  const connect = useCallback(async () => {
-    if (!isConnected) {
-      await open({ view: 'Connect', namespace: 'eip155' });
-    }
-  }, [isConnected, open]);
+  const connect = useCallback(
+    async (referral?: string) => {
+      if (!isConnected) {
+        referralRef.current ??= referral;
+        await open({ view: 'Connect', namespace: 'eip155' });
+      }
+    },
+    [isConnected, open]
+  );
 
   const connectToServer = useCallback(async () => {
     const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
@@ -133,6 +137,7 @@ export const useWallet = (): WalletContextType => {
       const { access_token } = await authService.verifySignature({
         address,
         signature,
+        referredAddress: referralRef.current,
       });
 
       if (!access_token) {
@@ -192,12 +197,7 @@ export const useWallet = (): WalletContextType => {
         setBalance(null);
         clearError();
       }
-
-      // Disconnect from wallet
-
-      isDisconnectedRef.current = true;
     } catch (error) {
-      isDisconnectedRef.current = false;
       console.error('Disconnect failed:', error);
       if (isMountedRef.current) setError(error, 'wallet');
     }

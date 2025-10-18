@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
@@ -36,7 +36,11 @@ const AuthenticatedLayout: React.FC = () => {
       </Button>
 
       {/* Mobile Sidebar */}
-      <Suspense fallback={<FullScreenLoader variant="normal" message="Loading sidebar..." />}>
+      <Suspense
+        fallback={
+          <FullScreenLoader variant="normal" message="Loading sidebar..." />
+        }
+      >
         <Sidebar
           isMobile={true}
           isOpen={isMobileMenuOpen}

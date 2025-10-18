@@ -1,12 +1,12 @@
 import React, { lazy, Suspense } from 'react';
-import type { ActivityItem } from '@/modules/activity/types';
 import { FullScreenLoader } from '@/modules/shared/components/loader';
+import type { UserReferral } from '@/modules/auth/services/auth.service';
 
 // Lazy load ActivityAvatar component
 const ActivityAvatar = lazy(() => import('./activity-avatar'));
 
 interface ActivityCardProps {
-  activity: ActivityItem;
+  activity: UserReferral;
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
@@ -32,43 +32,39 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
           }
         >
           <ActivityAvatar
-            type={activity.icon?.type || 'avatar'}
-            background={activity.icon?.background}
-            text={activity.icon?.text}
-            symbol={activity.icon?.symbol}
-            isReceived={activity.type === 'received'}
+            type="avatar"
+            background="#3B82F6"
+            text={activity.referrer.tagName.charAt(0).toUpperCase()}
+            symbol={undefined}
+            isReceived={false}
           />
         </Suspense>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="text-white font-medium">
-          {activity.user?.username && (
-            <span className="text-white">{activity.user.username}</span>
-          )}
-          {activity.title && (
-            <span className="text-white font-semibold">{activity.title}</span>
-          )}
+        {/* Referrer info */}
+        <div className="text-white font-semibold">
+          {activity.referrer.tagName}
         </div>
 
-        {activity.description && (
-          <div className="text-gray-400 text-sm mt-1">
-            {activity.description}
-          </div>
-        )}
+        <div className="text-gray-400 text-sm mt-1 break-all">
+          Referrer Wallet: {activity.referrer.walletAddress}
+        </div>
+
+        <div className="text-gray-400 text-sm mt-1 break-all">
+          Referred Wallet: {activity.referredAddress}
+        </div>
 
         <div className="text-gray-400 text-sm mt-1">
-          {formatTimeAgo(activity.timestamp)}
+          {formatTimeAgo(activity.createdAt)}
         </div>
       </div>
 
-      {/* Amount/Value */}
-      {activity.amount && (
-        <div className="flex-shrink-0 text-white font-medium">
-          {activity.amount}
-        </div>
-      )}
+      {/* Points */}
+      <div className="flex-shrink-0 text-white font-medium">
+        {activity.referrer.points} pts
+      </div>
     </div>
   );
 };

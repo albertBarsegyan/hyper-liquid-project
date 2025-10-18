@@ -8,11 +8,29 @@ export interface ReferralUser {
   totalReferralEarnings: number;
 }
 
+export interface ReferrerUser {
+  id: string;
+  tagName: string;
+  walletAddress: string;
+  points: number;
+  referralCode: string;
+  totalSuccessfulReferrals: number;
+  totalReferralEarnings: number;
+}
+
 export interface ReferralStats {
   totalReferrals: number;
   successfulReferrals: number;
   totalEarnings: number;
   pendingEarnings: number;
+}
+
+export interface ReferrerStatsResponse {
+  totalReferrals: number;
+  successfulReferrals: number;
+  totalEarnings: number;
+  pendingEarnings: number;
+  referrers: ReferrerUser[];
 }
 
 export interface ReferralReward {

@@ -1,0 +1,70 @@
+{
+  "rules": [
+    "You are working on a React/TypeScript crypto application with a modular architecture.",
+    "The project uses Vite, Tailwind CSS, and React Query for state management.",
+    "The codebase follows a feature-based modular structure under src/modules/.",
+    "Each module contains components, hooks, services, and types.",
+    "Use TypeScript strictly and follow React best practices.",
+    "Prefer functional components with hooks over class components.",
+    "Use the existing UI components from src/components/ui/ when possible.",
+    "Follow the established path aliases: @/*, @/modules/*, @/types/*, @/routes/*, @/styles/*, @/pages/*."
+  ],
+  "include": [
+    "src/**/*",
+    "package.json",
+    "tsconfig*.json",
+    "vite.config.ts",
+    "eslint.config.js",
+    "components.json",
+    "README.md",
+    "vercel.json"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    ".git/**/*",
+    ".vscode/**/*",
+    ".continue/**/*",
+    "**/*.log",
+    "**/*.tmp",
+    "**/*.cache",
+    "**/coverage/**/*",
+    "**/.next/**/*",
+    "**/build/**/*",
+    "**/out/**/*",
+    "**/.turbo/**/*",
+    "**/pnpm-lock.yaml",
+    "**/yarn.lock",
+    "**/package-lock.json",
+    "**/.env.local",
+    "**/.env.*.local",
+    "**/public/dliqd.png",
+    "**/src/assets/fonts/**/*",
+    "**/src/assets/images/**/*",
+    "**/src/assets/favicon/**/*"
+  ],
+  "context": {
+    "max_tokens": 200000,
+    "max_files": 100,
+    "use_ignore": true,
+    "use_gitignore": true
+  },
+  "models": [
+    {
+      "title": "GPT-4",
+      "provider": "openai",
+      "model": "gpt-4"
+    }
+  ],
+  "tab_autocomplete": {
+    "enabled": true,
+    "max_tokens": 100,
+    "max_lines": 10
+  },
+  "allow_anonymous_telemetry": false,
+  "embeddings_provider": {
+    "provider": "openai",
+    "title": "OpenAI Embeddings",
+    "model": "text-embedding-3-small"
+  }
+}
