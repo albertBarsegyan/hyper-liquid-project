@@ -13,6 +13,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
+import { useAuthReferrals } from '@/modules/activity/hooks/useAuthReferrals.tsx';
 
 interface Task {
   id: string;
@@ -33,29 +34,7 @@ export interface Reward {
   achieved: boolean;
 }
 
-const achievements: Reward[] = [
-  {
-    id: 'sendtag',
-    title: 'Deposit 10$',
-    amount: 1000,
-    icon: Star,
-    achieved: false,
-  },
-  {
-    id: 'balance',
-    title: 'Make balance 8,888',
-    amount: 5000,
-    icon: Coins,
-    achieved: false,
-  },
-  {
-    id: 'savings',
-    title: 'Make 3 referral',
-    amount: 3000,
-    icon: TrendingUp,
-    achieved: true,
-  },
-];
+const REFERRAL_COUNT = 3;
 
 const tasks: Task[] = [
   {
@@ -112,6 +91,33 @@ const tasks: Task[] = [
 
 const RewardsPage: React.FC = () => {
   const { balanceState } = useWalletContext();
+  const { data } = useAuthReferrals();
+
+  const totalReferrals = data?.totalReferrals ?? 0;
+
+  const achievements: Reward[] = [
+    {
+      id: 'sendtag',
+      title: 'Deposit 10$',
+      amount: 1000,
+      icon: Star,
+      achieved: false,
+    },
+    {
+      id: 'balance',
+      title: 'Make balance 8,888',
+      amount: 5000,
+      icon: Coins,
+      achieved: false,
+    },
+    {
+      id: 'savings',
+      title: `Make 3 referral (you made ${totalReferrals})`,
+      amount: 3000,
+      icon: TrendingUp,
+      achieved: totalReferrals >= REFERRAL_COUNT,
+    },
+  ];
 
   return (
     <div className="container-responsive py-responsive">

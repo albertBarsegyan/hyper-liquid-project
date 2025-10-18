@@ -20,7 +20,14 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getMain(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading dashboard..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader
+                variant="normal"
+                message="Loading dashboard..."
+              />
+            }
+          >
             <DashboardPage />
           </Suspense>
         ),
@@ -28,7 +35,14 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getSend(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading send page..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader
+                variant="normal"
+                message="Loading send page..."
+              />
+            }
+          >
             <SendPage />
           </Suspense>
         ),
@@ -36,7 +50,11 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getRewards(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading rewards..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader variant="normal" message="Loading rewards..." />
+            }
+          >
             <RewardsPage />
           </Suspense>
         ),
@@ -44,7 +62,14 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getDocs(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading documentation..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader
+                variant="normal"
+                message="Loading documentation..."
+              />
+            }
+          >
             <DocsPage />
           </Suspense>
         ),
@@ -52,7 +77,11 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getExplore(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading explore..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader variant="normal" message="Loading explore..." />
+            }
+          >
             <ExplorePage />
           </Suspense>
         ),
@@ -60,7 +89,14 @@ export const authenticatedRoutes = createBrowserRouter([
       {
         path: innerRoutePath.getActivity(),
         element: (
-          <Suspense fallback={<FullScreenLoader variant="normal" message="Loading activity..." />}>
+          <Suspense
+            fallback={
+              <FullScreenLoader
+                variant="normal"
+                message="Loading activity..."
+              />
+            }
+          >
             <ActivityPage />
           </Suspense>
         ),

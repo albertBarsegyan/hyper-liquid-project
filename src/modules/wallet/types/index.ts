@@ -17,7 +17,7 @@ export interface WalletContextType {
   balanceState: AdapterBlueprint.GetBalanceResult | null;
   isConnecting: boolean;
   error: string | null;
-  connect: (referredAddress?: string | null) => Promise<void>;
+  connect: (referredAddress?: string | undefined) => Promise<void>;
   disconnect: () => void;
   refreshBalance: () => Promise<void>;
   clearError: () => void;

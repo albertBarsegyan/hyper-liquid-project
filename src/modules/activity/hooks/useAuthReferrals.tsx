@@ -5,7 +5,6 @@ import { authService } from '@/modules/auth/services/auth.service';
 export const AUTH_REFERRAL_QUERY_KEYS = {
   referrals: ['auth', 'referrals'] as const,
   referrers: ['auth', 'referrers'] as const,
-  referralHistory: ['auth', 'referral-history'] as const,
 };
 
 /**
@@ -14,8 +13,8 @@ export const AUTH_REFERRAL_QUERY_KEYS = {
 export const useAuthReferrals = () => {
   return useQuery({
     queryKey: AUTH_REFERRAL_QUERY_KEYS.referrals,
-    queryFn: () => authService.getReferrals(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    queryFn: authService.getReferrals,
+    staleTime: 2 * 60 * 1000,
     retry: 1,
   });
 };
@@ -26,20 +25,8 @@ export const useAuthReferrals = () => {
 export const useAuthReferrers = () => {
   return useQuery({
     queryKey: AUTH_REFERRAL_QUERY_KEYS.referrers,
-    queryFn: () => authService.getReferrers(),
+    queryFn: authService.getReferrers,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 1,
-  });
-};
-
-/**
- * Hook to get referral history for the authenticated user
- */
-export const useAuthReferralHistory = () => {
-  return useQuery({
-    queryKey: AUTH_REFERRAL_QUERY_KEYS.referralHistory,
-    queryFn: () => authService.getReferralHistory(),
-    staleTime: 60 * 1000, // 1 minute
     retry: 1,
   });
 };

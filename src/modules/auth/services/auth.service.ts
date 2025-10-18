@@ -8,50 +8,36 @@ export interface AuthUser {
   points: number;
 }
 
-export interface UserToken {
-  token: string;
-}
-
-export interface ReferralStats {
-  totalReferrals: number;
-  successfulReferrals: number;
-  totalEarnings: number;
-  pendingEarnings: number;
-}
-
-export interface ReferrerStatsResponse {
+export interface ReferrerHistoryResponse {
   totalReferrers: number;
-  referrers: ReferrerStats[];
-}
-
-export interface ReferrerStats {
-  referrerId: string;
-  referrerName: string;
-  totalEarnings: number;
-  totalReferrals: number;
+  referrers: UserReferral[];
 }
 
 export interface ReferralHistoryResponse {
   totalReferrals: number;
-  history: ReferralHistoryItem[];
+  referrals: UserReferral[];
 }
 
-export interface ReferralHistoryItem {
+export interface UserReferral {
   id: string;
-  referredUser: {
-    tagName: string;
-    walletAddress: string;
-  };
-  status: 'pending' | 'successful' | 'failed';
-  reward: number;
+  referrerId: string;
+  referredUserId: string;
+  referrerAddress: string;
+  referredAddress: string;
   createdAt: string;
-  completedAt?: string;
+  referrer: UserReferralDetails;
+}
+
+interface UserReferralDetails {
+  id: string;
+  tagName: string;
+  walletAddress: string;
+  points: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const authService = {
-  /**
-   * Request nonce from server
-   */
   requestNonce: async (address: string): Promise<string> => {
     const response = await mainApiInstance.get('auth/nonce', {
       searchParams: { address },
@@ -110,28 +96,13 @@ export const authService = {
     return response.json();
   },
 
-  /**
-   * Get referral statistics for the authenticated user
-   */
-  getReferrals: async (): Promise<ReferralStats> => {
+  getReferrals: async (): Promise<ReferralHistoryResponse> => {
     const response = await mainApiInstance.get('auth/referrals');
     return response.json();
   },
 
-  /**
-   * Get referrer statistics for the authenticated user
-   */
-  getReferrers: async (): Promise<ReferrerStatsResponse> => {
+  getReferrers: async (): Promise<ReferrerHistoryResponse> => {
     const response = await mainApiInstance.get('auth/referrers');
-    return response.json();
-  },
-
-  /**
-   * Get referral history for the authenticated user
-   */
-
-  getReferralHistory: async (): Promise<ReferralHistoryResponse> => {
-    const response = await mainApiInstance.get('auth/referral/history');
     return response.json();
   },
 };
