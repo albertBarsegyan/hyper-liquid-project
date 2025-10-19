@@ -10,8 +10,8 @@ export const ActivityHeader: React.FC = () => {
   const { data: referrerStats, isLoading: referrerLoading } =
     useAuthReferrers();
 
-  // const totalReferrals = referralStats?.totalReferrals ?? 0;
-  const totalReferrers = referrerStats?.totalReferrers ?? 0;
+  const totalReferrals = referralStats?.totalReferrals ?? 0;
+  // const totalReferrers = referrerStats?.totalReferrers ?? 0;
 
   const isLoading = statsLoading || referrerLoading;
 
@@ -30,7 +30,7 @@ export const ActivityHeader: React.FC = () => {
                   <div>
                     <p className="text-gray-400 text-sm">Total Referrals</p>
                     <p className="text-white font-semibold text-lg">
-                      {totalReferrers}
+                      {totalReferrals}
                     </p>
                   </div>
                 </div>
