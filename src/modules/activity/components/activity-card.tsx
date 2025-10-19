@@ -34,7 +34,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
           <ActivityAvatar
             type="avatar"
             background="#3B82F6"
-            text={activity.referrer.tagName.charAt(0).toUpperCase()}
+            text={activity.referrer?.tagName.charAt(0).toUpperCase()}
             symbol={undefined}
             isReceived={false}
           />
@@ -45,11 +45,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
       <div className="flex-1 min-w-0">
         {/* Referrer info */}
         <div className="text-white font-semibold">
-          {activity.referrer.tagName}
+          {activity?.referrer?.tagName}
         </div>
 
         <div className="text-gray-400 text-sm mt-1 break-all">
-          Referrer Wallet: {activity.referrer.walletAddress}
+          Referrer Wallet: {activity.referrer?.walletAddress}
         </div>
 
         <div className="text-gray-400 text-sm mt-1 break-all">
@@ -59,11 +59,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
         <div className="text-gray-400 text-sm mt-1">
           {formatTimeAgo(activity.createdAt)}
         </div>
-      </div>
-
-      {/* Points */}
-      <div className="flex-shrink-0 text-white font-medium">
-        {activity.referrer.points} pts
       </div>
     </div>
   );
