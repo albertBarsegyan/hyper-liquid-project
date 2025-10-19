@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils.ts';
 
-export function PointsRenderer({ points }: { points: number[] }) {
+export function PointsRenderer({ points }: { points?: number }) {
   const [isActive, setIsActive] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
