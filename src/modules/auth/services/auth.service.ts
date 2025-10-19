@@ -25,7 +25,7 @@ export interface UserReferral {
   referrerAddress: string;
   referredAddress: string;
   createdAt: string;
-  referrer: UserReferralDetails;
+  referrer?: UserReferralDetails;
 }
 
 interface UserReferralDetails {
