@@ -3,7 +3,7 @@ import { useWallet } from '../hooks/wallet.tsx';
 import { type WalletContextType } from '../types';
 import { createAppKit } from '@reown/appkit/react';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-import { bsc } from '@/modules/wallet/constants/networks.ts';
+import { bsc, bscTestnet } from '@/modules/wallet/constants/networks.ts';
 
 import { Buffer } from 'buffer';
 
@@ -46,9 +46,12 @@ if (!PROJECT_ID) {
  * - Social login options
  * - On-ramp integration for purchasing crypto
  */
+
+const isTestMode = Boolean(import.meta.env.VITE_APP_TEST_NET as string);
+
 const appKit = createAppKit({
   adapters: [new EthersAdapter()],
-  networks: [bsc],
+  networks: [isTestMode ? bscTestnet : bsc],
   metadata,
   projectId: PROJECT_ID,
   features: {

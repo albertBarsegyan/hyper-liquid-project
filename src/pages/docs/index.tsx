@@ -35,8 +35,8 @@ const DocsPage: React.FC = () => {
             </h3>
             <p className="text-gray-300 leading-relaxed">
               BNB is a decentralized platform for Real World Assets (RWA)
-              liquidity on the HyperLiquid network. Connect your wallet and
-              start earning rewards through our Genesis Campaign.
+              liquidity on the Canton network. Connect your wallet and start
+              earning rewards through our Genesis Campaign.
             </p>
           </div>
 
@@ -355,7 +355,7 @@ const DocsPage: React.FC = () => {
           <div className="text-center">
             <p className="text-gray-400 mb-4">
               Powered by{' '}
-              <span className="text-green-400 font-medium">HyperLiquid</span>
+              <span className="text-green-400 font-medium">Canton</span>
             </p>
             <p className="text-sm text-gray-500">
               Need help? Contact our support team or join our community.
