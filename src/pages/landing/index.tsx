@@ -43,13 +43,13 @@ const LandingPage: React.FC = () => {
                 className="text-responsive-3xl sm:text-responsive-4xl lg:text-6xl capitalise font-bold leading-tight"
                 style={{ color: '#97fce4' }}
               >
-                Decentralized RWA liquidity on BNB, powered by real-world
-                low-latency data centers.
+                Decentralized low-latency liquidity powered by physical data
+                center network on Canton.
               </h1>
               <div className="text-responsive-lg sm:text-responsive-xl lg:text-2xl">
                 <Typewriter
                   className="capitalize text-[14px] lg:text-[18px] opacity-80"
-                  text="Connect your wallet and join Genesis Compaign."
+                  text="Connect your wallet to join Genesis Compaign."
                 />
               </div>
             </div>
