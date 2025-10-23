@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
             </Link>
 
             <div>
-              <p className="ml-[16px]">powered by HyperLiquid</p>
+              <p className="ml-[16px]">powered by Canton</p>
             </div>
           </div>
 
