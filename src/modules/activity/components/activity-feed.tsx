@@ -4,6 +4,7 @@ import {
   useAuthReferrers,
 } from '@/modules/activity/hooks/useAuthReferrals';
 import { FullScreenLoader } from '@/modules/shared/components/loader';
+import ModuleErrorBoundary from '@/components/module-error-boundary';
 
 const ActivityCard = lazy(() => import('./activity-card'));
 const ActivityEmptyState = lazy(() => import('./activity-empty-state'));
@@ -116,65 +117,67 @@ export const ActivityFeed: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Referrers Section */}
-      {Boolean(totalReferrals) && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              People You Referred
-            </h2>
-            <span className="text-sm text-gray-400">
-              {totalReferrals} referral{totalReferrals !== 1 ? 's' : ''}
-            </span>
+    <ModuleErrorBoundary moduleName="Activity Feed" showDetails={true}>
+      <div className="space-y-8">
+        {/* Referrers Section */}
+        {Boolean(totalReferrals) && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">
+                People You Referred
+              </h2>
+              <span className="text-sm text-gray-400">
+                {totalReferrals} referral{totalReferrals !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {referrals.map(activity => (
+                <Suspense
+                  key={activity.id}
+                  fallback={
+                    <FullScreenLoader
+                      variant="normal"
+                      message="Loading activity..."
+                    />
+                  }
+                >
+                  <ActivityCard activity={activity} />
+                </Suspense>
+              ))}
+            </div>
           </div>
-          <div className="space-y-3">
-            {referrals.map(activity => (
-              <Suspense
-                key={activity.id}
-                fallback={
-                  <FullScreenLoader
-                    variant="normal"
-                    message="Loading activity..."
-                  />
-                }
-              >
-                <ActivityCard activity={activity} />
-              </Suspense>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Referrals Section */}
-      {Boolean(totalReferrers) && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              People Who referred you
-            </h2>
-            <span className="text-sm text-gray-400">
-              {totalReferrers} referral
-              {totalReferrers !== 1 ? 's' : ''}
-            </span>
+        {/* Referrals Section */}
+        {Boolean(totalReferrers) && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">
+                People Who referred you
+              </h2>
+              <span className="text-sm text-gray-400">
+                {totalReferrers} referral
+                {totalReferrers !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {referrers.map(activity => (
+                <Suspense
+                  key={activity.id}
+                  fallback={
+                    <FullScreenLoader
+                      variant="normal"
+                      message="Loading activity..."
+                    />
+                  }
+                >
+                  <ActivityCard activity={activity} />
+                </Suspense>
+              ))}
+            </div>
           </div>
-          <div className="space-y-3">
-            {referrers.map(activity => (
-              <Suspense
-                key={activity.id}
-                fallback={
-                  <FullScreenLoader
-                    variant="normal"
-                    message="Loading activity..."
-                  />
-                }
-              >
-                <ActivityCard activity={activity} />
-              </Suspense>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ModuleErrorBoundary>
   );
 };
