@@ -45,6 +45,8 @@ if (!PROJECT_ID) {
  * - Email wallet support
  * - Social login options
  * - On-ramp integration for purchasing crypto
+ * - Injected wallet support (including Binance Wallet)
+ * - EIP-6963 wallet detection
  */
 
 const isTestMode = Boolean(import.meta.env.VITE_APP_TEST_NET as string);
@@ -67,9 +69,18 @@ const appKit = createAppKit({
     '--w3m-border-radius-master': '8px',
   },
 
-  enableInjected: false,
+  enableInjected: true,
   enableEIP6963: true,
   enableCoinbase: true,
+
+  // Additional configuration for better wallet support
+  includeWalletIds: [
+    'c57ca95b47569778a828d19178114f4db188b89f', // MetaMask
+    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7', // Trust Wallet
+    'fd20dc426fb37566d803205b19bbc1d4096b248c',
+    '19177a98252e07ddfc9afb3f1f5c6e6938f5e90', // Coinbase Wallet
+    'c286eebc742a537cd1d6818363e9dc53b2178a6e', // WalletConnect
+  ],
 });
 
 /**

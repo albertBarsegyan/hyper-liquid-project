@@ -1,5 +1,30 @@
 import { formatEther, formatUnits, parseUnits } from 'ethers';
 import type { WalletError } from '@/modules/wallet/types';
+import type {
+  BinanceChainProvider,
+  BinanceWalletProvider,
+  EthereumProvider,
+} from '@/types/global';
+
+// EIP-6963 provider interface
+interface EIP6963Provider {
+  isBinance?: boolean;
+  isMetaMask?: boolean;
+  isCoinbaseWallet?: boolean;
+  isTrust?: boolean;
+  isWalletConnect?: boolean;
+  [key: string]: unknown;
+}
+
+// Union type for all possible wallet providers
+export type WalletProvider =
+  | EthereumProvider
+  | BinanceWalletProvider
+  | BinanceChainProvider
+  | EIP6963Provider;
+
+// Export the EIP-6963 provider interface
+export type { EIP6963Provider };
 
 export const isWalletError = (error: unknown): error is WalletError => {
   return (
@@ -29,12 +54,33 @@ export const getWalletErrorMessage = (error: WalletError | Error): string => {
         return 'Request already pending. Please check your wallet';
       case -32603:
         return 'Internal error. Please try again';
+      // Binance Wallet specific error codes
+      case -32601:
+        return 'Method not found. Please ensure your wallet supports this operation';
+      case -32000:
+        return 'Invalid request. Please check your wallet connection';
+      case -32001:
+        return 'Resource not found. Please refresh and try again';
       default:
         return error.message || 'An unknown error occurred';
     }
   }
 
-  return error.message || 'An unknown error occurred';
+  // Handle specific Binance Wallet error messages
+  const errorMessage = error.message || 'An unknown error occurred';
+  if (errorMessage.includes('Binance') || errorMessage.includes('binance')) {
+    if (errorMessage.includes('not installed')) {
+      return 'Binance Wallet is not installed. Please install it from the official website.';
+    }
+    if (errorMessage.includes('locked')) {
+      return 'Binance Wallet is locked. Please unlock it and try again.';
+    }
+    if (errorMessage.includes('network')) {
+      return 'Network error. Please check your internet connection and try again.';
+    }
+  }
+
+  return errorMessage;
 };
 
 // ==================== Address Utilities ====================
@@ -278,6 +324,105 @@ export const getRelativeTime = (timestamp: number): string => {
   if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
   if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
   return 'Just now';
+};
+
+// ==================== Wallet Detection Utilities ====================
+
+/**
+ * Checks if Binance Wallet is installed and available
+ * @returns true if Binance Wallet is detected
+ */
+export const isBinanceWalletInstalled = (): boolean => {
+  if (typeof window === 'undefined') return false;
+
+  // Check for Binance Wallet in window.ethereum
+  if (
+    window.ethereum &&
+    'isBinance' in window.ethereum &&
+    window.ethereum.isBinance
+  ) {
+    return true;
+  }
+
+  // Check for Binance Wallet in window.BinanceChain
+  if (window.BinanceChain) return true;
+
+  // Check for Binance Wallet in EIP-6963 providers
+  if (
+    window.ethereum &&
+    'providers' in window.ethereum &&
+    Array.isArray(window.ethereum.providers)
+  ) {
+    return window.ethereum.providers.some(
+      (provider: EIP6963Provider) =>
+        provider.isBinance === true || provider.isMetaMask === true
+    );
+  }
+
+  return false;
+};
+
+/**
+ * Gets the Binance Wallet provider if available
+ * @returns Binance Wallet provider or null
+ */
+export const getBinanceWalletProvider = (): WalletProvider | null => {
+  if (typeof window === 'undefined') return null;
+
+  // Check for Binance Wallet in window.ethereum
+  if (
+    window.ethereum &&
+    'isBinance' in window.ethereum &&
+    window.ethereum.isBinance
+  ) {
+    return window.ethereum;
+  }
+
+  // Check for Binance Wallet in window.BinanceChain
+  if (window.BinanceChain) {
+    return window.BinanceChain as BinanceChainProvider;
+  }
+
+  // Check for Binance Wallet in EIP-6963 providers
+  if (
+    window.ethereum &&
+    'providers' in window.ethereum &&
+    Array.isArray(window.ethereum.providers)
+  ) {
+    const provider = window.ethereum.providers.find(
+      (provider: EIP6963Provider) =>
+        provider.isBinance === true || provider.isMetaMask === true
+    ) as WalletProvider;
+    return provider ?? null;
+  }
+
+  return null;
+};
+
+/**
+ * Checks if a provider is a Binance Wallet provider
+ * @param provider - The wallet provider to check
+ * @returns true if the provider is a Binance Wallet
+ */
+export const isBinanceWalletProvider = (
+  provider: WalletProvider | null
+): provider is BinanceWalletProvider | BinanceChainProvider => {
+  if (!provider) return false;
+
+  return 'isBinance' in provider && provider.isBinance === true;
+};
+
+/**
+ * Checks if a provider is a MetaMask provider
+ * @param provider - The wallet provider to check
+ * @returns true if the provider is MetaMask
+ */
+export const isMetaMaskProvider = (
+  provider: WalletProvider | null
+): provider is EthereumProvider => {
+  if (!provider) return false;
+
+  return 'isMetaMask' in provider && provider.isMetaMask === true;
 };
 
 // ==================== Validation Utilities ====================
