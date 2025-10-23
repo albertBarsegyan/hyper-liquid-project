@@ -1,13 +1,13 @@
-import React, { lazy, Suspense, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { FullScreenLoader } from '@/modules/shared/components/loader';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import { PointsRenderer } from '@/modules/shared/components/points-renderer';
+import Sidebar from '@/components/sidebar.tsx';
 
 // Lazy load Sidebar component
-const Sidebar = lazy(() => import('./sidebar'));
 
 const AuthenticatedLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -291,7 +291,7 @@ const DashboardPage: React.FC = () => {
                   className="text-4xl font-bold mb-2"
                   style={{ color: '#97fce4' }}
                 >
-                  {balanceState?.balance} {balanceState?.symbol}
+                  {balanceState?.balance} BNB
                 </div>
                 <p style={{ color: '#97fce4', opacity: 0.8 }}>
                   Available Balance
