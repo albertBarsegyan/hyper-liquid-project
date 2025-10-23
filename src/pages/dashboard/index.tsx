@@ -208,13 +208,13 @@ const DashboardPage: React.FC = () => {
                     className="text-sm font-medium mb-1"
                     style={{ color: '#97fce4', opacity: 0.8 }}
                   >
-                    Network
+                    Supported Network
                   </p>
                   <p
                     className="text-lg font-semibold"
                     style={{ color: '#97fce4' }}
                   >
-                    {isCorrectNetwork ? 'BNB' : `Chain ${chainId}`}
+                    BNB and multi-chain (coming soon)
                   </p>
                 </div>
                 <div
@@ -225,13 +225,13 @@ const DashboardPage: React.FC = () => {
                     className="text-sm font-medium mb-1"
                     style={{ color: '#97fce4', opacity: 0.8 }}
                   >
-                    Wallet Type
+                    Wallet Ecosystem
                   </p>
                   <p
                     className="text-lg font-semibold"
                     style={{ color: '#97fce4' }}
                   >
-                    {walletInfo?.name}
+                    Canton Network
                   </p>
                 </div>
               </div>
