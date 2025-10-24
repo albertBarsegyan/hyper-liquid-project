@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Send, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Send } from 'lucide-react';
 
 const SendPage: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const SendPage: React.FC = () => {
             className="text-responsive-3xl font-bold mb-2"
             style={{ color: '#97fce4' }}
           >
-            Send
+            Transactions
           </h1>
           <p
             className="text-responsive-base"
@@ -29,7 +29,7 @@ const SendPage: React.FC = () => {
               style={{ color: '#97fce4' }}
             >
               <Send className="mr-2 h-5 w-5" />
-              Send Transaction
+              Transaction
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
