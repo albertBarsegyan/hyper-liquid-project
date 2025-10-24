@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
               <div className="text-responsive-lg sm:text-responsive-xl lg:text-2xl">
                 <Typewriter
                   className="capitalize text-[14px] lg:text-[18px] opacity-80"
-                  text="Connect your wallet to join Genesis Compaign."
+                  text="Connect your wallet to join Genesis Campaign."
                 />
               </div>
             </div>
