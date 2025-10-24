@@ -22,6 +22,17 @@ const LandingPage: React.FC = () => {
     >
       {/* Content Section */}
       <div className="h-screen z-10 flex flex-col lg:flex-row lg:justify-between lg:flex-1">
+        <div className="hidden lg:flex flex-1 p-6">
+          <div className="w-full h-full">
+            <Carousel
+              images={carouselImages}
+              autoPlay={true}
+              interval={4000}
+              className="h-full shadow-2xl"
+            />
+          </div>
+        </div>
+
         <div className=" flex flex-col items-start justify-between flex-1 p-responsive">
           {/* Header */}
           <div className="w-full">
@@ -62,16 +73,6 @@ const LandingPage: React.FC = () => {
         </div>
 
         {/* Right side carousel - Desktop */}
-        <div className="hidden lg:flex flex-1 p-6">
-          <div className="w-full h-full">
-            <Carousel
-              images={carouselImages}
-              autoPlay={true}
-              interval={4000}
-              className="h-full shadow-2xl"
-            />
-          </div>
-        </div>
       </div>
 
       {/* Mobile/Tablet carousel - Below content */}

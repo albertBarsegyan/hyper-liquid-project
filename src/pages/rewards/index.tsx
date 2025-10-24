@@ -98,14 +98,14 @@ const RewardsPage: React.FC = () => {
   const achievements: Reward[] = [
     {
       id: 'sendtag',
-      title: 'Deposit 10$',
+      title: 'Deposit 10$ (Coming soon)',
       amount: 1000,
       icon: Star,
       achieved: false,
     },
     {
       id: 'balance',
-      title: 'Make balance 8,888',
+      title: 'Make balance 8,888 (Coming soon)',
       amount: 5000,
       icon: Coins,
       achieved: false,

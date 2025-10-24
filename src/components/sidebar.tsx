@@ -21,17 +21,18 @@ const navigationItems = [
     path: innerRoutePath.getMain(),
   },
   {
-    id: 'send',
-    label: 'Send',
-    icon: Send,
-    path: '/send',
-  },
-  {
     id: 'rewards',
     label: 'Rewards',
     icon: Trophy,
     path: '/rewards',
   },
+  {
+    id: 'send',
+    label: 'Transactions',
+    icon: Send,
+    path: innerRoutePath.getTransactions(),
+  },
+
   {
     id: 'activity',
     label: 'Activity',

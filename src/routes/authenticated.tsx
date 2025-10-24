@@ -33,7 +33,7 @@ export const authenticatedRoutes = createBrowserRouter([
         ),
       },
       {
-        path: innerRoutePath.getSend(),
+        path: innerRoutePath.getTransactions(),
         element: (
           <Suspense
             fallback={
