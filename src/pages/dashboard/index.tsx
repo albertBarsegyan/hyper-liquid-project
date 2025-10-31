@@ -13,36 +13,28 @@ import {
   AlertTriangle,
   CheckCircle,
   Copy,
-  ExternalLink,
-  RefreshCw,
   Wallet,
   XCircle,
 } from 'lucide-react';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
-import { CHAIN_CONFIG } from '@/modules/wallet/types';
 
-const generateReferralCode = (address: string): string => {
-  return window.location.origin + toQueryString({ referred: address });
+const generateReferralCode = (tagName: string): string => {
+  return window.location.origin + toQueryString({ referred: tagName });
 };
 
 const DashboardPage: React.FC = () => {
   const {
     isConnected,
-    accountAddress,
-    chainId,
     balanceState,
     isCorrectNetwork,
     error,
-    refreshBalance,
     clearError,
-    walletInfo,
     disconnect,
   } = useWalletContext();
+  const { authUser } = useWalletContext();
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  // Address formatting removed to avoid exposing wallet address
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -52,17 +44,15 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const openExplorer = () => {
-    if (accountAddress) {
-      window.open(`https://bscscan.com/address/${accountAddress}`, '_blank');
-    }
-  };
+  // Explorer disabled to avoid exposing wallet address
 
   const handleDisconnect = () => {
     if (window.confirm('Are you sure you want to disconnect your wallet?')) {
       disconnect();
     }
   };
+
+  const referralCodeLink = generateReferralCode(authUser?.hashTag ?? '');
 
   if (!isConnected) {
     return (
@@ -149,7 +139,7 @@ const DashboardPage: React.FC = () => {
                 style={{ color: '#97fce4' }}
               >
                 <Wallet className="h-5 w-5 mr-2" />
-                Wallet Information
+                Account Information
               </CardTitle>
               <p style={{ color: '#97fce4', opacity: 0.8 }}>
                 Your connected wallet details and network status
@@ -168,33 +158,24 @@ const DashboardPage: React.FC = () => {
                     Address
                   </p>
                   <p className="font-mono text-lg" style={{ color: '#97fce4' }}>
-                    {formatAddress(accountAddress!)}
+                    #{authUser?.hashTag ?? 'anonymous'}
                   </p>
                 </div>
                 <div className="flex space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(accountAddress!)}
+                    onClick={() =>
+                      copyToClipboard(`#${authUser?.hashTag ?? ''}`)
+                    }
                     style={{
                       borderColor: '#97fce4',
                       color: '#97fce4',
                       backgroundColor: 'transparent',
                     }}
+                    title="Copy hashtag"
                   >
                     <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={openExplorer}
-                    style={{
-                      borderColor: '#97fce4',
-                      color: '#97fce4',
-                      backgroundColor: 'transparent',
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -236,42 +217,44 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div
-                className="flex w-full items-center justify-between gap-4 p-4 rounded-lg"
-                style={{ backgroundColor: '#0e1e27' }}
-              >
-                <div className=" w-full">
-                  <p
-                    className="text-sm font-medium mb-1"
-                    style={{ color: '#97fce4', opacity: 0.8 }}
-                  >
-                    Referral Code
-                  </p>
-                  <p
-                    className="text-lg font-semibold"
-                    style={{ color: '#97fce4' }}
-                  >
-                    {formatAddress(accountAddress!)}
-                  </p>
-                </div>
+              {authUser?.hashTag && (
+                <div
+                  className="flex w-full items-center justify-between gap-4 p-4 rounded-lg"
+                  style={{ backgroundColor: '#0e1e27' }}
+                >
+                  <div className=" w-full">
+                    <p
+                      className="text-sm font-medium mb-1"
+                      style={{ color: '#97fce4', opacity: 0.8 }}
+                    >
+                      Referral Code
+                    </p>
+                    <Button
+                      variant="link"
+                      onClick={() => copyToClipboard(referralCodeLink)}
+                      className="text-lg font-semibold underline hover:underline"
+                      style={{ color: '#97fce4' }}
+                    >
+                      {authUser?.hashTag}
+                    </Button>
+                  </div>
 
-                <div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(generateReferralCode(accountAddress!))
-                    }
-                    style={{
-                      borderColor: '#97fce4',
-                      color: '#97fce4',
-                      backgroundColor: 'transparent',
-                    }}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
+                  <div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(referralCodeLink)}
+                      style={{
+                        borderColor: '#97fce4',
+                        color: '#97fce4',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
@@ -291,7 +274,7 @@ const DashboardPage: React.FC = () => {
                   className="text-4xl font-bold mb-2"
                   style={{ color: '#97fce4' }}
                 >
-                  {balanceState?.balance} BNB
+                  {balanceState?.balance ?? '0'} {balanceState?.symbol ?? 'BNB'}
                 </div>
                 <p style={{ color: '#97fce4', opacity: 0.8 }}>
                   Available Balance
@@ -331,17 +314,6 @@ const DashboardPage: React.FC = () => {
                     className="text-sm"
                     style={{ color: '#97fce4', opacity: 0.8 }}
                   >
-                    Chain ID
-                  </span>
-                  <span className="font-mono" style={{ color: '#97fce4' }}>
-                    {chainId}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span
-                    className="text-sm"
-                    style={{ color: '#97fce4', opacity: 0.8 }}
-                  >
                     Status
                   </span>
                   <Badge
@@ -351,23 +323,6 @@ const DashboardPage: React.FC = () => {
                     }}
                   >
                     {isCorrectNetwork ? 'Connected' : 'Wrong Network'}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span
-                    className="text-sm"
-                    style={{ color: '#97fce4', opacity: 0.8 }}
-                  >
-                    Wallet
-                  </span>
-                  <Badge
-                    style={{
-                      backgroundColor: '#97fce4',
-                      opacity: 0.3,
-                      color: '#0e1e27',
-                    }}
-                  >
-                    {walletInfo?.name}
                   </Badge>
                 </div>
               </div>
@@ -383,33 +338,7 @@ const DashboardPage: React.FC = () => {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={refreshBalance}
-                style={{
-                  borderColor: '#97fce4',
-                  color: '#97fce4',
-                  backgroundColor: 'transparent',
-                }}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh Balance
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={openExplorer}
-                style={{
-                  borderColor: '#97fce4',
-                  color: '#97fce4',
-                  backgroundColor: 'transparent',
-                }}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View on Explorer
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => copyToClipboard(accountAddress!)}
+                onClick={() => copyToClipboard(`#${authUser?.hashTag ?? ''}`)}
                 style={{
                   borderColor: '#97fce4',
                   color: '#97fce4',
@@ -417,7 +346,7 @@ const DashboardPage: React.FC = () => {
                 }}
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Copy Address
+                Copy Hashtag
               </Button>
               <Button
                 className="w-full justify-start"
@@ -429,46 +358,8 @@ const DashboardPage: React.FC = () => {
                 }}
               >
                 <XCircle className="h-4 w-4 mr-2" />
-                Disconnect Wallet
+                Sign out
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Network Info */}
-          <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
-            <CardHeader>
-              <CardTitle style={{ color: '#97fce4' }}>BNB Network</CardTitle>
-              <p style={{ color: '#97fce4', opacity: 0.8 }}>
-                Network configuration details
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: '#97fce4', opacity: 0.8 }}>Chain ID</span>
-                <span className="font-mono" style={{ color: '#97fce4' }}>
-                  {CHAIN_CONFIG.chainId}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span style={{ color: '#97fce4', opacity: 0.8 }}>Currency</span>
-                <span style={{ color: '#97fce4' }}>
-                  {CHAIN_CONFIG.nativeCurrency.name}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span style={{ color: '#97fce4', opacity: 0.8 }}>Explorer</span>
-                <a
-                  href={CHAIN_CONFIG.blockExplorerUrls?.[0] ?? ''}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                  style={{ color: '#97fce4' }}
-                >
-                  Bscscan
-                </a>
-              </div>
             </CardContent>
           </Card>
         </div>

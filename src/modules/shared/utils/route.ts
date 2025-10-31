@@ -8,11 +8,13 @@ export const innerRoutePath = {
   getTransactionHistory: () => '/transactions',
   getActivity: () => '/activity',
   getTransactions: () => '/transactions',
+  getDeposit: () => '/deposit',
   getExplore: () => '/explore',
   getRewards: () => '/rewards',
   getAdditionalInfo: () => '/additional-info',
   getProfileSettings: () => '/profile-settings',
   getForgetPassword: () => '/forget-password',
   getPasswordReset: (hash: string) => `/password-reset/${hash}`,
+  getSignUp: (queryString: string = '') => `/sign-up${queryString}`,
   getAll: () => '*',
 };

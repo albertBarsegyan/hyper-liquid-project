@@ -10,6 +10,7 @@ const SendPage = lazy(() => import('../pages/send/index.tsx'));
 const ExplorePage = lazy(() => import('../pages/explore/index.tsx'));
 const RewardsPage = lazy(() => import('../pages/rewards/index.tsx'));
 const ActivityPage = lazy(() => import('../pages/activity/index.tsx'));
+const DepositPage = lazy(() => import('../pages/deposit/index.tsx'));
 const DocsPage = lazy(() => import('@/pages/docs'));
 
 export const authenticatedRoutes = createBrowserRouter([
@@ -44,6 +45,18 @@ export const authenticatedRoutes = createBrowserRouter([
             }
           >
             <SendPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: innerRoutePath.getDeposit(),
+        element: (
+          <Suspense
+            fallback={
+              <FullScreenLoader variant="normal" message="Loading deposit..." />
+            }
+          >
+            <DepositPage />
           </Suspense>
         ),
       },

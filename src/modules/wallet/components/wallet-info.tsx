@@ -1,16 +1,14 @@
 import React from 'react';
-import { CHAIN_CONFIG } from '@/modules/wallet/types';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 
 const WalletInfo: React.FC = () => {
   const {
     isConnected,
-    accountAddress,
-    chainId,
     balanceState,
     isCorrectNetwork,
     walletInfo,
     error,
+    authUser,
   } = useWalletContext();
 
   if (!isConnected) {
@@ -46,7 +44,6 @@ const WalletInfo: React.FC = () => {
     );
   }
 
-  const isHyperEVM = String(chainId) === CHAIN_CONFIG.chainId;
   const statusColor = isCorrectNetwork ? '#97fce4' : '#ff6b6b';
   const statusText = isCorrectNetwork ? 'Connected' : 'Wrong Network';
 
@@ -82,22 +79,20 @@ const WalletInfo: React.FC = () => {
       <div className="space-y-2 text-responsive-sm">
         <div className="break-all">
           <span className="font-medium" style={{ color: '#97fce4' }}>
-            Address:
+            Hashtag:
           </span>{' '}
           <span
             className="font-mono"
             style={{ color: '#97fce4', opacity: 0.8 }}
           >
-            {accountAddress}
+            #{authUser?.hashTag ?? 'anonymous'}
           </span>
         </div>
         <div>
           <span className="font-medium" style={{ color: '#97fce4' }}>
             Network:
           </span>{' '}
-          <span style={{ color: statusColor }}>
-            {isHyperEVM ? 'BNB Mainnet' : `Chain ${chainId}`}
-          </span>
+          <span style={{ color: statusColor }}>{'BNB Mainnet'}</span>
         </div>
         <div>
           <span className="font-medium" style={{ color: '#97fce4' }}>
@@ -107,12 +102,7 @@ const WalletInfo: React.FC = () => {
             {balanceState?.balance}
           </span>
         </div>
-        <div>
-          <span className="font-medium" style={{ color: '#97fce4' }}>
-            Chain ID:
-          </span>{' '}
-          <span style={{ color: '#97fce4', opacity: 0.8 }}>{chainId}</span>
-        </div>
+
         {!isCorrectNetwork && (
           <div
             className="mt-3 p-2 rounded text-responsive-xs"

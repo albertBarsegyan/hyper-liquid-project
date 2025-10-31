@@ -1,191 +1,218 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BrowserProvider, type Eip1193Provider } from 'ethers';
-import type { AdapterBlueprint } from '@reown/appkit/adapters';
+import { JsonRpcProvider } from 'ethers';
 import {
-  useAppKit,
-  useAppKitAccount,
-  useAppKitBalance,
-  useAppKitNetwork,
-  useAppKitProvider,
-  useAppKitState,
-  useDisconnect,
-  useWalletInfo,
-} from '@reown/appkit/react';
-
-import { CHAIN_CONFIG, type WalletContextType } from '@/modules/wallet/types';
+  CHAIN_CONFIG,
+  type SignInParams,
+  type SignUpParams,
+  type WalletContextType,
+} from '@/modules/wallet/types';
 import { storageName } from '@/modules/shared/constants/storage-name.ts';
 import { localStorageUtil } from '@/modules/shared/utils/local-storage.ts';
 import {
   authService,
   type AuthUser,
+  type WebAuthnRegistrationResponse,
 } from '@/modules/auth/services/auth.service.ts';
 import { responseMessage } from '@/modules/shared/constants/app-messages.ts';
+import { getErrorMessage } from '@/modules/shared/utils/error.ts';
+import {
+  startAuthentication,
+  startRegistration,
+} from '@simplewebauthn/browser';
+import { formatBalance } from '@/modules/wallet/utils/index.ts';
 
 export const useWallet = (): WalletContextType => {
-  const { open } = useAppKit();
-  const { address, isConnected, status } = useAppKitAccount();
-  const { chainId } = useAppKitNetwork();
-  const { fetchBalance } = useAppKitBalance();
-  const { initialized, loading: walletLoading } = useAppKitState();
-  const { walletProvider } = useAppKitProvider('eip155');
-  const { disconnect: appKitDisconnect } = useDisconnect();
-  const { walletInfo } = useWalletInfo();
-
-  const [balance, setBalance] =
-    useState<AdapterBlueprint.GetBalanceResult | null>(null);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [walletError, setWalletError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [balanceState, setBalanceState] = useState<{
+    balance: string;
+    symbol: string;
+  } | null>(null);
 
   const isMountedRef = useRef(true);
   const hasConnectedOnceRef = useRef(false);
   const authInitializedRef = useRef(false);
   const authUserRef = useRef<AuthUser | null>(null);
-  const walletProviderRef = useRef(walletProvider);
   const authInProgressRef = useRef(false);
-  const referralRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     authUserRef.current = authUser;
   }, [authUser]);
 
+  // Fetch wallet balance when authUser wallet address is available
   useEffect(() => {
-    walletProviderRef.current = walletProvider;
-  }, [walletProvider]);
-
-  const isCorrectNetwork = useMemo(() => {
-    if (!chainId) return false;
-    const targetChainId = parseInt(CHAIN_CONFIG.chainId, 16);
-    return chainId === targetChainId;
-  }, [chainId]);
-
-  const clearError = useCallback(() => {
-    setAuthError(null);
-    setWalletError(null);
-  }, []);
-
-  const setError = useCallback(
-    (_: unknown, source: 'wallet' | 'auth' = 'wallet') => {
-      if (source === 'wallet') {
-        setWalletError(responseMessage.WENT_WRONG);
-      } else {
-        setAuthError(responseMessage.WENT_WRONG);
-      }
-    },
-    []
-  );
-
-  // ---------------------------------------------
-  // Core Logic (stabilized callbacks)
-  // ---------------------------------------------
-  const refreshBalance = useCallback(async () => {
-    try {
-      const fetchedBalance = await fetchBalance();
-      if (fetchedBalance?.data && isMountedRef.current) {
-        setBalance(fetchedBalance.data);
-      }
-    } catch (error) {
-      setError(error, 'wallet');
-    }
-  }, [fetchBalance, setError]);
-
-  const connect = useCallback(
-    async (referral?: string) => {
-      if (!isConnected) {
-        referralRef.current ??= referral;
-        await open({ view: 'Connect', namespace: 'eip155' });
-      }
-    },
-    [isConnected, open]
-  );
-
-  const connectToServer = useCallback(async () => {
-    const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
-    const currentAuthUser = authUserRef.current;
-    const currentWalletProvider = walletProviderRef.current;
-
-    if (
-      !address ||
-      token ||
-      !currentWalletProvider ||
-      Boolean(currentAuthUser) ||
-      !isMountedRef.current
-    ) {
-      return;
-    }
-
-    setIsConnecting(true);
-    authInProgressRef.current = true;
-
-    try {
-      // Step 1: Request nonce
-      const nonce = await authService.requestNonce(address as string);
-
-      // Step 2: Sign message
-      const provider = new BrowserProvider(
-        currentWalletProvider as Eip1193Provider
-      );
-
-      const signer = await provider.getSigner();
-      const signature = await signer.signMessage(nonce);
-
-      // Verify address hasn't changed after user interaction
-
-      // Step 3: Verify signature
-      const { access_token } = await authService.verifySignature({
-        address,
-        signature,
-        referredAddress: referralRef.current,
-      });
-
-      if (!access_token) {
-        setAuthError('No access token received');
+    const fetchBalance = async () => {
+      if (!authUser?.walletAddress) {
+        setBalanceState(null);
         return;
       }
 
-      localStorageUtil.setItem(storageName.AUTH_TOKEN, access_token);
+      try {
+        // Use BSC RPC endpoint from CHAIN_CONFIG
+        const rpcUrl =
+          CHAIN_CONFIG.rpcUrls?.[0] || 'https://bsc-dataseed.binance.org/';
+        const provider = new JsonRpcProvider(rpcUrl);
 
-      // Step 4: Get profile BEFORE saving token to ensure consistency
-      const profile = await authService.getProfile();
+        // Get balance in wei (returns bigint in ethers v6)
+        const balanceWei = await provider.getBalance(authUser.walletAddress);
 
-      if (!profile) {
-        setAuthError('Failed to fetch user profile');
+        // Format balance and get symbol
+        // formatBalance accepts string or bigint
+        const formattedBalance = formatBalance(balanceWei, 18);
+        const symbol = CHAIN_CONFIG.nativeCurrency?.symbol || 'BNB';
+
+        if (isMountedRef.current) {
+          setBalanceState({
+            balance: formattedBalance,
+            symbol,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch wallet balance:', error);
+        if (isMountedRef.current) {
+          setBalanceState(null);
+        }
+      }
+    };
+
+    void fetchBalance();
+  }, [authUser?.walletAddress]);
+
+  const clearError = useCallback(() => {
+    setAuthError(null);
+  }, []);
+
+  const setError = useCallback((errorMessage?: string) => {
+    setAuthError(errorMessage ?? responseMessage.WENT_WRONG);
+  }, []);
+
+  const signUp = useCallback(
+    async ({ hashTag, referrer }: SignUpParams) => {
+      if (!hashTag.trim()) {
+        setAuthError('Tag name is required');
+        return;
       }
 
-      // Only save token after successful profile fetch
-
-      // Update state if still mounted and address matches
-
-      hasConnectedOnceRef.current = true;
-
-      setAuthUser(profile);
-      await refreshBalance();
-    } catch (error) {
-      // Clean up any partial authentication state
-      localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-
-      if (isMountedRef.current) {
-        // Check if user rejected the signature request
-        setError(error, 'auth');
-
-        // Reset connection flag to allow retry
-        hasConnectedOnceRef.current = false;
+      if (hasConnectedOnceRef.current) {
+        return;
       }
-    } finally {
-      if (isMountedRef.current) setIsConnecting(false);
 
-      authInProgressRef.current = false;
-    }
-  }, [address, refreshBalance, setError]);
+      setIsConnecting(true);
+      authInProgressRef.current = true;
+
+      try {
+        // Step 1: Start WebAuthn registration
+        const registrationOptions = await authService.startWebAuthnRegistration(
+          hashTag,
+          referrer
+        );
+
+        // Step 2: Create credential with authenticator using SimpleWebAuthn
+        const credentialForServer = await startRegistration({
+          optionsJSON: registrationOptions.options,
+          useAutoRegister: true,
+        });
+
+        // Step 3: Complete registration
+        const result: WebAuthnRegistrationResponse =
+          await authService.completeWebAuthnRegistration(
+            registrationOptions.userId,
+            credentialForServer
+          );
+
+        if (result.access_token) {
+          localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
+        }
+
+        // Step 4: Get profile
+        const profile = await authService.getProfile();
+
+        if (!profile) {
+          setAuthError('Failed to fetch user profile');
+          return;
+        }
+
+        hasConnectedOnceRef.current = true;
+        setAuthUser(profile);
+        setError('');
+      } catch (error) {
+        // Clean up any partial authentication state
+        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+
+        if (isMountedRef.current) {
+          setError(getErrorMessage(error));
+          hasConnectedOnceRef.current = false;
+        }
+      } finally {
+        if (isMountedRef.current) setIsConnecting(false);
+        authInProgressRef.current = false;
+      }
+    },
+    [setError]
+  );
+
+  const signIn = useCallback(
+    async ({ referrer, hashTag }: SignInParams) => {
+      setIsConnecting(true);
+      authInProgressRef.current = true;
+
+      try {
+        // Step 1: Start WebAuthn authentication
+        const authenticationOptions =
+          await authService.startWebAuthnAuthentication({ hashTag, referrer });
+
+        // Step 2: Get credential from authenticator using SimpleWebAuthn
+        const credentialForServer = await startAuthentication({
+          optionsJSON: authenticationOptions,
+        });
+
+        // Step 3: Complete authentication
+        const result = await authService.completeWebAuthnAuthentication(
+          hashTag,
+          credentialForServer
+        );
+
+        if (!result.access_token) {
+          setAuthError('No access token received');
+          return;
+        }
+
+        localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
+
+        // Step 4: Get profile
+        const profile = await authService.getProfile();
+
+        if (!profile) {
+          setAuthError('Failed to fetch user profile');
+          return;
+        }
+
+        hasConnectedOnceRef.current = true;
+        setAuthUser(profile);
+        setError('');
+      } catch (error) {
+        console.log('error', error);
+        // Clean up any partial authentication state
+        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+
+        if (isMountedRef.current) {
+          setError(getErrorMessage(error));
+          hasConnectedOnceRef.current = false;
+        }
+      } finally {
+        if (isMountedRef.current) setIsConnecting(false);
+        authInProgressRef.current = false;
+      }
+    },
+    [setError]
+  );
 
   const disconnect = useCallback(async () => {
     try {
-      await appKitDisconnect();
       // Cancel any in-progress authentication
       authInProgressRef.current = false;
-
       hasConnectedOnceRef.current = false;
 
       // Sign out from auth service
@@ -194,14 +221,13 @@ export const useWallet = (): WalletContextType => {
       // Clear local state
       if (isMountedRef.current) {
         setAuthUser(null);
-        setBalance(null);
         clearError();
       }
     } catch (error) {
       console.error('Disconnect failed:', error);
-      if (isMountedRef.current) setError(error, 'wallet');
+      if (isMountedRef.current) setError(getErrorMessage(error));
     }
-  }, [appKitDisconnect, clearError, setError]);
+  }, [clearError, setError]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -210,21 +236,9 @@ export const useWallet = (): WalletContextType => {
     };
   }, []);
 
-  // Handle initial connection to server
-  useEffect(() => {
-    if (
-      Boolean(address) &&
-      !isConnecting &&
-      !hasConnectedOnceRef.current &&
-      !authInProgressRef.current
-    ) {
-      void connectToServer();
-    }
-  }, [isConnecting, connectToServer, disconnect, address]);
-
   // Initialize auth on mount
   useEffect(() => {
-    if (!initialized || authInitializedRef.current) return;
+    if (authInitializedRef.current) return;
     authInitializedRef.current = true;
 
     const initializeAuth = async () => {
@@ -235,12 +249,10 @@ export const useWallet = (): WalletContextType => {
       }
 
       try {
-        const isValid = await authService.verifyToken();
-        if (isValid) {
-          const currentUser = await authService.getProfile();
+        const currentUser = await authService.getProfile();
+        if (currentUser) {
           if (currentUser && isMountedRef.current) {
             setAuthUser(currentUser);
-            await refreshBalance();
           } else {
             // Profile fetch failed, clear invalid token
             localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
@@ -258,48 +270,39 @@ export const useWallet = (): WalletContextType => {
     };
 
     void initializeAuth();
-  }, [initialized, refreshBalance]);
+  }, []);
 
   return useMemo(
     (): WalletContextType => ({
-      isConnected,
-      accountAddress: address,
-      chainId,
-      balanceState: balance,
-      isCorrectNetwork,
-      walletInfo,
+      isConnected: Boolean(authUser),
+      accountAddress: authUser?.walletAddress,
+      balanceState,
+      isCorrectNetwork: true,
+      walletInfo: undefined,
 
       authUser,
       isAuthenticated: Boolean(authUser),
       authError,
 
-      isConnecting: isConnecting || status === 'connecting',
-      loading: loading || walletLoading,
-      error: walletError ?? authError,
-      switchToCorrectNetwork: () => {},
-      connect,
+      isConnecting,
+      loading,
+      error: authError,
       disconnect,
-      refreshBalance,
+
       clearError,
+      signUp,
+      signIn,
     }),
     [
-      isConnected,
-      address,
-      chainId,
-      balance,
-      isCorrectNetwork,
-      walletInfo,
       authUser,
       authError,
       isConnecting,
-      status,
       loading,
-      walletLoading,
-      walletError,
-      connect,
       disconnect,
-      refreshBalance,
       clearError,
+      signUp,
+      signIn,
+      balanceState,
     ]
   );
 };

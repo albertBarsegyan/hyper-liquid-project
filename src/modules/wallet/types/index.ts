@@ -1,7 +1,5 @@
 import type { AddEthereumChainParameter } from '@/types/etherium.ts';
 import type { AuthUser } from '@/modules/auth/services/auth.service.ts';
-import type { AdapterBlueprint } from '@reown/appkit/adapters';
-import type { ConnectedWalletInfo } from '@reown/appkit';
 
 export interface WalletError extends Error {
   code: number;
@@ -9,24 +7,32 @@ export interface WalletError extends Error {
   data?: unknown;
 }
 
+export interface SignUpParams {
+  hashTag: string;
+  referrer?: string;
+}
+
+export interface SignInParams {
+  referrer?: string;
+  hashTag: string;
+}
+
 export interface WalletContextType {
   isConnected: boolean;
   accountAddress: string | undefined;
   isCorrectNetwork: boolean;
-  chainId: string | number | undefined;
-  balanceState: AdapterBlueprint.GetBalanceResult | null;
+  balanceState: { balance: string; symbol: string } | null;
   isConnecting: boolean;
   error: string | null;
-  connect: (referredAddress?: string | undefined) => Promise<void>;
+  signUp: (params: SignUpParams) => Promise<void>;
+  signIn: (params: SignInParams) => Promise<void>;
   disconnect: () => void;
-  refreshBalance: () => Promise<void>;
   clearError: () => void;
   authUser: AuthUser | null;
   isAuthenticated: boolean;
   authError: string | null;
   loading: boolean;
-  switchToCorrectNetwork: VoidFunction;
-  walletInfo: ConnectedWalletInfo | undefined;
+  walletInfo: { name: string } | undefined;
 }
 
 export const CHAIN_CONFIG: AddEthereumChainParameter = {

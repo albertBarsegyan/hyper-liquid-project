@@ -1,11 +1,25 @@
 import { mainApiInstance } from '@/configs/api/main-instance.ts';
 import { localStorageUtil } from '@/modules/shared/utils/local-storage.ts';
 import { storageName } from '@/modules/shared/constants/storage-name.ts';
+import type {
+  AuthenticationResponseJSON,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON,
+} from '@simplewebauthn/browser';
 
 export interface AuthUser {
-  tagName: string;
+  hashTag: string;
   walletAddress: string;
   points: number;
+}
+
+export interface WebAuthnRegistrationResponse {
+  access_token?: string;
+}
+
+export interface WebAuthnAuthenticationResponse {
+  access_token: string;
 }
 
 export interface ReferrerHistoryResponse {
@@ -22,15 +36,16 @@ export interface UserReferral {
   id: string;
   referrerId: string;
   referredUserId: string;
-  referrerAddress: string;
-  referredAddress: string;
-  createdAt: string;
-  referrer?: UserReferralDetails;
+  referrerTagname: string; // Referrer's unique tag name (referral code)
+  referredTagname: string; // Referred user's tag name at the time
+  createdAt: string; // ISO string
+  referrer?: UserReferralDetails; // Optional detailed referrer info
+  referredUser?: UserReferralDetails; // Optional detailed referred user info
 }
 
 interface UserReferralDetails {
   id: string;
-  tagName: string;
+  hashTag: string;
   walletAddress: string;
   points: number;
   createdAt: string;
@@ -70,18 +85,6 @@ export const authService = {
   },
 
   /**
-   * Verify token
-   */
-  verifyToken: async (): Promise<boolean> => {
-    const response = await mainApiInstance.get('auth/profile');
-    if (!response.ok) {
-      authService.signOut();
-      return false;
-    }
-    return true;
-  },
-
-  /**
    * Sign out
    */
   signOut: (): void => {
@@ -104,5 +107,87 @@ export const authService = {
   getReferrers: async (): Promise<ReferrerHistoryResponse> => {
     const response = await mainApiInstance.get('auth/referrers');
     return response.json();
+  },
+
+  startWebAuthnRegistration: async (
+    tagName: string,
+    referredByTagName?: string
+  ): Promise<{
+    options: PublicKeyCredentialCreationOptionsJSON;
+    userId: number;
+  }> => {
+    const response = await mainApiInstance.post(
+      'auth/webauthn/register/start',
+      {
+        json: {
+          tagName,
+          referredByTagName,
+        },
+      }
+    );
+
+    return response.json<{
+      options: PublicKeyCredentialCreationOptionsJSON;
+      userId: number;
+    }>();
+  },
+
+  /**
+   * Complete WebAuthn registration
+   */
+  completeWebAuthnRegistration: async (
+    userId: string | number,
+    credential: RegistrationResponseJSON
+  ): Promise<WebAuthnRegistrationResponse> => {
+    const response = await mainApiInstance.post(
+      'auth/webauthn/register/complete',
+      {
+        json: {
+          userId,
+          credential,
+        },
+      }
+    );
+
+    return response.json<WebAuthnRegistrationResponse>();
+  },
+
+  /**
+   * Start WebAuthn authentication
+   */
+  startWebAuthnAuthentication: async ({
+    hashTag,
+    referrer,
+  }: {
+    hashTag: string;
+    referrer?: string;
+  }): Promise<PublicKeyCredentialRequestOptionsJSON> => {
+    const response = await mainApiInstance.post('auth/webauthn/login/start', {
+      json: {
+        referrer,
+        hashTag,
+      },
+    });
+
+    return response.json<PublicKeyCredentialRequestOptionsJSON>();
+  },
+
+  /**
+   * Complete WebAuthn authentication
+   */
+  completeWebAuthnAuthentication: async (
+    tagName: string,
+    credential: AuthenticationResponseJSON
+  ): Promise<WebAuthnRegistrationResponse> => {
+    const response = await mainApiInstance.post(
+      'auth/webauthn/login/complete',
+      {
+        json: {
+          tagName,
+          credential,
+        },
+      }
+    );
+    return response.json<WebAuthnAuthenticationResponse>();
   },
 };
