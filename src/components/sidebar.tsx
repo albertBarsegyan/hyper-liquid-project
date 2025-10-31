@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { innerRoutePath } from '@/modules/shared/utils/route';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
-import { Activity, Home, Send, Trophy, User, X } from 'lucide-react';
+import { Activity, Download, Home, Send, Trophy, User, X } from 'lucide-react';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { clsx } from 'clsx';
 
@@ -27,6 +27,12 @@ const navigationItems = [
     path: '/rewards',
   },
   {
+    id: 'deposit',
+    label: 'Deposit',
+    icon: Download,
+    path: innerRoutePath.getDeposit(),
+  },
+  {
     id: 'send',
     label: 'Transactions',
     icon: Send,
@@ -49,15 +55,13 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { accountAddress, isConnected } = useWalletContext();
+  const { isConnected, authUser } = useWalletContext();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  // Removed address formatting to avoid exposing wallet address
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -151,10 +155,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             <User className="h-5 w-5 mr-3" />
             <div className="flex flex-col items-start">
               <span className="font-medium">Account</span>
-              {isConnected && accountAddress && (
-                <span className="text-xs opacity-70">
-                  {formatAddress(accountAddress)}
-                </span>
+              {isConnected && authUser?.hashTag && (
+                <span className="text-xs opacity-70">#{authUser.hashTag}</span>
               )}
             </div>
           </Button>

@@ -3,10 +3,9 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import React from 'react';
 import type { Reward } from '@/pages/rewards';
-import { AdapterBlueprint } from '@reown/appkit/adapters';
 
 interface BalanceDisplayProps {
-  balanceState: AdapterBlueprint.GetBalanceResult | null;
+  balanceState: { balance: string; symbol: string } | null;
   currency: string;
   achievements: Array<Reward>;
 }
