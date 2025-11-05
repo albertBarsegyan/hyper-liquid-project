@@ -47,7 +47,7 @@ const DashboardPage: React.FC = () => {
   // Explorer disabled to avoid exposing wallet address
 
   const handleDisconnect = () => {
-    if (window.confirm('Are you sure you want to disconnect your wallet?')) {
+    if (window.confirm('Are you sure you want to sign out.')) {
       disconnect();
     }
   };
