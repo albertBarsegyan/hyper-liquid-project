@@ -162,7 +162,6 @@ export const useWallet = (): WalletContextType => {
         // Step 1: Start WebAuthn authentication
         const authenticationOptions =
           await authService.startWebAuthnAuthentication({ hashTag, referrer });
-
         // Step 2: Get credential from authenticator using SimpleWebAuthn
         const credentialForServer = await startAuthentication({
           optionsJSON: authenticationOptions,

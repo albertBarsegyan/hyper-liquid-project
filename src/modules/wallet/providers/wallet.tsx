@@ -2,10 +2,6 @@ import React, { createContext, type ReactNode } from 'react';
 import { useWallet } from '../hooks/wallet.tsx';
 import { type WalletContextType } from '../types';
 
-import { Buffer } from 'buffer';
-
-window.Buffer = window.Buffer || Buffer;
-
 export const WalletContext = createContext<WalletContextType | undefined>(
   undefined
 );
