@@ -17,11 +17,11 @@ const LandingPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen relative flex flex-col"
+      className="relative flex flex-col"
       style={{ backgroundColor: '#0e1e27' }}
     >
       {/* Content Section */}
-      <div className="h-screen z-10 flex flex-col lg:flex-row lg:justify-between lg:flex-1">
+      <div className="min-h-screen z-10 flex flex-col lg:flex-row lg:justify-between lg:flex-1">
         <div className="hidden lg:flex flex-1 p-6">
           <div className="w-full h-full">
             <Carousel
