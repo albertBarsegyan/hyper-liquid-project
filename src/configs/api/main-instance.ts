@@ -12,7 +12,7 @@ export const mainApiInstance = ky.create({
     'Content-Type': 'application/json',
     Connection: 'keep-alive',
   },
-  timeout: 5000,
+  timeout: 20000,
   retry: 2,
   hooks: {
     beforeRequest: [
