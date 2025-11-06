@@ -178,25 +178,6 @@ export const parseBalance = (value: string, decimals: number = 18): bigint => {
 };
 
 /**
- * Formats a USD value with proper formatting
- * @param value - USD value as number or string
- * @returns Formatted USD string (e.g., "$1,234.56")
- */
-export const formatUSD = (value: number | string): string => {
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(num)) return '$0.00';
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
-};
-
-// ==================== Chain Utilities ====================
-
-/**
  * Converts a chain ID to hex format
  * @param chainId - Chain ID as number
  * @returns Chain ID in hex format (e.g., "0x38")
