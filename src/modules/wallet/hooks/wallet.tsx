@@ -16,6 +16,8 @@ import {
 import { responseMessage } from '@/modules/shared/constants/app-messages.ts';
 import { getErrorMessage } from '@/modules/shared/utils/error.ts';
 import {
+  type PublicKeyCredentialCreationOptionsJSON,
+  type PublicKeyCredentialRequestOptionsJSON,
   startAuthentication,
   startRegistration,
 } from '@simplewebauthn/browser';
@@ -103,11 +105,42 @@ export const useWallet = (): WalletContextType => {
       authInProgressRef.current = true;
 
       try {
-        // Step 1: Start WebAuthn registration
-        const registrationOptions = await authService.startWebAuthnRegistration(
-          hashTag,
-          referrer
+        // Step 1: Start WebAuthn registration using native fetch for Safari compatibility
+        // This must be called within a user gesture (click handler) using native fetch
+        const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+        const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const registrationResponse = await fetch(
+          `${APP_BASE_URL}/auth/webauthn/register/start`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              tagName: hashTag,
+              referredByTagName: referrer,
+            }),
+          }
         );
+
+        if (!registrationResponse.ok) {
+          const errorData = (await registrationResponse.json()) as {
+            message: string;
+          };
+
+          setError(errorData?.message);
+          return;
+        }
+
+        const registrationOptions = (await registrationResponse.json()) as {
+          options: PublicKeyCredentialCreationOptionsJSON;
+          userId: number;
+        };
 
         // Step 2: Create credential with authenticator using SimpleWebAuthn
         const credentialForServer = await startRegistration({
@@ -159,9 +192,41 @@ export const useWallet = (): WalletContextType => {
       authInProgressRef.current = true;
 
       try {
-        // Step 1: Start WebAuthn authentication
+        // Step 1: Start WebAuthn authentication using native fetch for Safari compatibility
+        // This must be called within a user gesture (click handler) using native fetch
+        const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+        const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const authenticationResponse = await fetch(
+          `${APP_BASE_URL}/auth/webauthn/login/start`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              referrer,
+              hashTag,
+            }),
+          }
+        );
+
+        if (!authenticationResponse.ok) {
+          const errorData = (await authenticationResponse.json()) as {
+            message: string;
+          };
+
+          setError(errorData?.message);
+          return;
+        }
+
         const authenticationOptions =
-          await authService.startWebAuthnAuthentication({ hashTag, referrer });
+          (await authenticationResponse.json()) as PublicKeyCredentialRequestOptionsJSON;
+
         // Step 2: Get credential from authenticator using SimpleWebAuthn
         const credentialForServer = await startAuthentication({
           optionsJSON: authenticationOptions,

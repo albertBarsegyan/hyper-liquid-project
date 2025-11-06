@@ -143,7 +143,7 @@ export const formatBalance = (
     if (num === 0) return '0';
     if (num < 0.0001) return '< 0.0001';
 
-    return num.toFixed(maxDecimals).replace(/\.?0+$/, '');
+    return num?.toFixed(maxDecimals)?.replace(/\.?0+$/, '');
   } catch {
     return '0';
   }
