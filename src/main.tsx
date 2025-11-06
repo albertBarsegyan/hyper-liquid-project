@@ -1,3 +1,6 @@
+// Polyfills must be imported first
+import '@/polyfills/text-encoder';
+
 import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/index.css';
