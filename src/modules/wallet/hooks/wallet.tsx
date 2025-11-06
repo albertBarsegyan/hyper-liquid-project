@@ -106,7 +106,8 @@ export const useWallet = (): WalletContextType => {
 
       try {
         // Step 1: Start WebAuthn registration using native fetch for Safari compatibility
-        // This must be called within a user gesture (click handler) using native fetch
+        // CRITICAL: Only ONE async operation (this fetch) is allowed before startRegistration
+        // See: https://github.com/MasterKale/SimpleWebAuthn/discussions/433
         const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
         const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
         const headers: HeadersInit = {
@@ -128,30 +129,36 @@ export const useWallet = (): WalletContextType => {
           }
         );
 
-        if (!registrationResponse.ok) {
-          const errorData = (await registrationResponse.json()) as {
-            message: string;
-          };
+        // Parse JSON only once to avoid multiple async operations
+        const registrationData = (await registrationResponse.json()) as
+          | {
+              options: PublicKeyCredentialCreationOptionsJSON;
+              userId: number;
+            }
+          | { message: string };
 
-          setError(errorData?.message);
+        // Check for errors after parsing
+        if (!registrationResponse.ok || 'message' in registrationData) {
+          const errorMessage =
+            'message' in registrationData
+              ? registrationData.message
+              : `HTTP ${registrationResponse.status}`;
+          setError(errorMessage);
           return;
         }
 
-        const registrationOptions = (await registrationResponse.json()) as {
-          options: PublicKeyCredentialCreationOptionsJSON;
-          userId: number;
-        };
-
         // Step 2: Create credential with authenticator using SimpleWebAuthn
+        // This must happen immediately after the single async fetch operation
         const credentialForServer = await startRegistration({
-          optionsJSON: registrationOptions.options,
+          optionsJSON: registrationData.options,
           useAutoRegister: true,
         });
 
         // Step 3: Complete registration
+        // After startRegistration, we can make additional async calls
         const result: WebAuthnRegistrationResponse =
           await authService.completeWebAuthnRegistration(
-            registrationOptions.userId,
+            registrationData.userId,
             credentialForServer
           );
 
@@ -193,7 +200,8 @@ export const useWallet = (): WalletContextType => {
 
       try {
         // Step 1: Start WebAuthn authentication using native fetch for Safari compatibility
-        // This must be called within a user gesture (click handler) using native fetch
+        // CRITICAL: Only ONE async operation (this fetch) is allowed before startAuthentication
+        // See: https://github.com/MasterKale/SimpleWebAuthn/discussions/433
         const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
         const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
         const headers: HeadersInit = {
@@ -215,21 +223,25 @@ export const useWallet = (): WalletContextType => {
           }
         );
 
-        if (!authenticationResponse.ok) {
-          const errorData = (await authenticationResponse.json()) as {
-            message: string;
-          };
+        // Parse JSON only once to avoid multiple async operations
+        const authenticationData = (await authenticationResponse.json()) as
+          | PublicKeyCredentialRequestOptionsJSON
+          | { message: string };
 
-          setError(errorData?.message);
+        // Check for errors after parsing
+        if (!authenticationResponse.ok || 'message' in authenticationData) {
+          const errorMessage =
+            'message' in authenticationData
+              ? authenticationData.message
+              : `HTTP ${authenticationResponse.status}`;
+          setError(errorMessage);
           return;
         }
 
-        const authenticationOptions =
-          (await authenticationResponse.json()) as PublicKeyCredentialRequestOptionsJSON;
-
         // Step 2: Get credential from authenticator using SimpleWebAuthn
+        // This must happen immediately after the single async fetch operation
         const credentialForServer = await startAuthentication({
-          optionsJSON: authenticationOptions,
+          optionsJSON: authenticationData,
         });
 
         // Step 3: Complete authentication
