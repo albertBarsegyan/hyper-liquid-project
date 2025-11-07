@@ -1,5 +1,5 @@
 export const innerRoutePath = {
-  getMain: () => '/',
+  getMain: (queryString: string = '') => `/${queryString}`,
   getDocs: () => '/docs',
   getPricing: () => '/pricing',
   getVerification: () => '/verification',

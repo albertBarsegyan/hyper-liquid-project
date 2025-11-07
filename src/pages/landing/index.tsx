@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import { Carousel } from '@/components/ui/carousel';
 
@@ -10,10 +10,49 @@ import bg1 from '@/assets/images/bg-1.jpg';
 import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
 import bg4 from '@/assets/images/bg-5.jpg';
-import WalletConnectButton from '@/modules/wallet/components/wallet-connect-button.tsx';
+import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { toQueryString } from '@/modules/shared/utils/url.ts';
+import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
 
 const LandingPage: React.FC = () => {
+  const [hashTag, setHashTag] = React.useState('');
+
+  const { signIn, isConnecting, error } = useWalletContext();
+  const { showAlert } = useAlert();
+
+  const [searchParams] = useSearchParams();
+
+  const referredAddress = searchParams.get('referred') ?? undefined;
+
   const carouselImages = [bg1, bg2, bg3, bg4];
+
+  const handleSignIn = async () => {
+    if (!hashTag.trim()) {
+      showAlert({ variant: 'error', message: 'Please enter your hashTag' });
+      return;
+    }
+
+    const success = await signIn({
+      hashTag: hashTag,
+      referrer: referredAddress,
+    });
+
+    if (success) {
+      showAlert({ variant: 'success', message: 'Signed in successfully!' });
+    }
+  };
+
+  useEffect(() => {
+    if (!error) return;
+
+    showAlert({
+      variant: 'error',
+      message: error,
+    });
+  }, [error, showAlert]);
+
+  const isDisabled = !hashTag.trim() || isConnecting;
 
   return (
     <div
@@ -67,8 +106,63 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Wallet Connect Section */}
-          <div className="w-full max-w-md">
-            <WalletConnectButton />
+          <div className="w-full max-w-md flex flex-col gap-4">
+            <div>
+              <label
+                className="block text-sm mb-2"
+                style={{ color: '#97fce4' }}
+              >
+                Hashtag
+              </label>
+
+              <div className="flex items-center justify-between gap-2">
+                <span>#</span>
+                <input
+                  type="text"
+                  value={hashTag}
+                  autoComplete="username webauthn"
+                  disabled={isConnecting}
+                  autoFocus
+                  onChange={e => setHashTag(e.target.value)}
+                  placeholder="Your hashtag"
+                  className="w-full px-4 py-3 rounded-lg border"
+                  style={{
+                    backgroundColor: '#021e17',
+                    borderColor: '#97fce4',
+                    color: '#97fce4',
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') void handleSignIn();
+                  }}
+                />
+
+                <Button
+                  onClick={handleSignIn}
+                  disabled={isDisabled}
+                  className="h-12 text-responsive-base w-full"
+                  style={{
+                    backgroundColor: '#97fce4',
+                    color: '#0e1e27',
+                    border: 'none',
+                  }}
+                >
+                  {isConnecting ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center  justify-center">
+              <p>
+                Dont have account?{' '}
+                <Link
+                  className="underline"
+                  to={innerRoutePath.getSignUp(
+                    toQueryString({ referred: referredAddress })
+                  )}
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
 

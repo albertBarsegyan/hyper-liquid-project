@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate as useNav, useSearchParams } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import { Carousel } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
-import { useNavigate as useNav, useSearchParams } from 'react-router-dom';
+import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
 
 import bg1 from '@/assets/images/bg-1.jpg';
 import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
 import bg4 from '@/assets/images/bg-5.jpg';
+import { toQueryString } from '@/modules/shared/utils/url.ts';
 
 export const allowAlphaNumUnderscore = (value: string): string => {
   // Replace any character that is NOT a-z, A-Z, 0-9, or underscore
@@ -20,26 +21,40 @@ export const allowAlphaNumUnderscore = (value: string): string => {
 
 const SignUpPage: React.FC = () => {
   const navigate = useNav();
-  const [searchParams] = useSearchParams();
-  const referredByTagName = searchParams.get('referred') ?? undefined;
-  
-  const { signUp, isConnecting, authError } = useWalletContext();
-  
-  const carouselImages = [bg1, bg2, bg3, bg4];
+
+  const { signUp, isConnecting, error } = useWalletContext();
+  const { showAlert } = useAlert();
+
   const [hashTag, setHashTag] = useState('');
-  const [error, setError] = useState<string | null>(null);
+
+  const [searchParams] = useSearchParams();
+
+  const referredAddress = searchParams.get('referred') ?? undefined;
+
+  const carouselImages = [bg1, bg2, bg3, bg4];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    try {
-      await signUp({ hashTag, referrer: referredByTagName });
-      // Navigate to dashboard or home
+    const cleanedTag = hashTag.trim();
+    if (!cleanedTag) {
+      showAlert({ variant: 'error', message: 'Tag name is required' });
+      return;
+    }
+
+    const isSignUp = await signUp({
+      hashTag: cleanedTag,
+      referrer: referredAddress,
+    });
+
+    if (isSignUp) {
+      showAlert({ variant: 'success', message: 'Registration successful!' });
       navigate(innerRoutePath.getMain());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
-      console.error('Registration error:', err);
+    } else if (!error) {
+      showAlert({
+        variant: 'error',
+        message: 'Registration failed. Please try again.',
+      });
     }
   };
 
@@ -47,6 +62,14 @@ const SignUpPage: React.FC = () => {
     const filtered = allowAlphaNumUnderscore(e.target.value);
     setHashTag(filtered);
   };
+
+  useEffect(() => {
+    if (!error) return;
+
+    showAlert({ variant: 'error', message: error });
+  }, [error, showAlert]);
+
+  const isDisabled = !hashTag.trim() || isConnecting;
 
   return (
     <div
@@ -100,8 +123,8 @@ const SignUpPage: React.FC = () => {
           </div>
 
           {/* Sign Up Form */}
-          <div className="w-full max-w-md">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="w-full max-w-md flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex gap-4">
               <div className="flex items-center gap-2">
                 <div
                   className="text-responsive-base font-medium"
@@ -113,6 +136,8 @@ const SignUpPage: React.FC = () => {
                   type="text"
                   value={hashTag}
                   onChange={handleChange}
+                  disabled={isConnecting}
+                  autoComplete="username webauthn"
                   placeholder="hashtag"
                   className="flex-1 px-4 py-3 rounded-lg border"
                   style={{
@@ -124,23 +149,9 @@ const SignUpPage: React.FC = () => {
                 />
               </div>
 
-              {(error || authError) && (
-                <div
-                  className="px-4 py-3 rounded-lg text-responsive-sm"
-                  style={{
-                    backgroundColor: '#021e17',
-                    borderColor: '#ff6b6b',
-                    border: '1px solid',
-                    color: '#ff6b6b',
-                  }}
-                >
-                  {error || authError}
-                </div>
-              )}
-
               <Button
                 type="submit"
-                disabled={!hashTag.trim() || isConnecting}
+                disabled={isDisabled}
                 className="h-12 text-responsive-base w-full"
                 style={{
                   backgroundColor: '#97fce4',
@@ -148,9 +159,22 @@ const SignUpPage: React.FC = () => {
                   border: 'none',
                 }}
               >
-                {isConnecting ? 'Creating...' : 'Submit'}
+                {isConnecting ? 'Creating...' : 'Sign up'}
               </Button>
             </form>
+            <div className="flex items-center  justify-center">
+              <p>
+                Do you have account?{' '}
+                <Link
+                  className="underline"
+                  to={innerRoutePath.getMain(
+                    toQueryString({ referred: referredAddress })
+                  )}
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
 

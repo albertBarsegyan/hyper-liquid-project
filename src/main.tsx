@@ -5,6 +5,7 @@ import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/index.css';
 import { FullScreenLoader } from '@/modules/shared/components/loader';
+import { AlertProvider } from '@/modules/shared/contexts/alert-context.tsx';
 
 import { QueryProvider } from '@/providers/QueryProvider.tsx';
 import { WalletProvider } from '@/modules/wallet/providers/wallet.tsx';
@@ -15,20 +16,22 @@ const App = lazy(() => import('./App.tsx'));
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      <QueryProvider>
-        <WalletProvider>
-          <Suspense
-            fallback={
-              <FullScreenLoader
-                variant="fullscreen"
-                message="Loading application..."
-              />
-            }
-          >
-            <App />
-          </Suspense>
-        </WalletProvider>
-      </QueryProvider>
+      <AlertProvider>
+        <QueryProvider>
+          <WalletProvider>
+            <Suspense
+              fallback={
+                <FullScreenLoader
+                  variant="fullscreen"
+                  message="Loading application..."
+                />
+              }
+            >
+              <App />
+            </Suspense>
+          </WalletProvider>
+        </QueryProvider>
+      </AlertProvider>
     </ErrorBoundary>
   </StrictMode>
 );
