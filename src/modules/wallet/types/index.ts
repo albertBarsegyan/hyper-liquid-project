@@ -24,13 +24,12 @@ export interface WalletContextType {
   balanceState: { balance: string; symbol: string } | null;
   isConnecting: boolean;
   error: string | null;
-  signUp: (params: SignUpParams) => Promise<void>;
-  signIn: (params: SignInParams) => Promise<void>;
+  signUp: (params: SignUpParams) => Promise<boolean>;
+  signIn: (params: SignInParams) => Promise<boolean>;
   disconnect: () => void;
   clearError: () => void;
   authUser: AuthUser | null;
   isAuthenticated: boolean;
-  authError: string | null;
   loading: boolean;
   walletInfo: { name: string } | undefined;
 }
