@@ -124,7 +124,7 @@ const SignUpPage: React.FC = () => {
 
           {/* Sign Up Form */}
           <div className="w-full max-w-md flex flex-col gap-4">
-            <form onSubmit={handleSubmit} className="flex gap-4">
+            <div className="flex gap-4">
               <div className="flex items-center gap-2">
                 <div
                   className="text-responsive-base font-medium"
@@ -150,7 +150,8 @@ const SignUpPage: React.FC = () => {
               </div>
 
               <Button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={isDisabled}
                 className="h-12 text-responsive-base w-full"
                 style={{
@@ -161,7 +162,7 @@ const SignUpPage: React.FC = () => {
               >
                 {isConnecting ? 'Creating...' : 'Sign up'}
               </Button>
-            </form>
+            </div>
             <div className="flex items-center  justify-center">
               <p>
                 Do you have account?{' '}
