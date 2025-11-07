@@ -234,26 +234,20 @@ export const useWallet = (): WalletContextType => {
             ? authenticationData.message
             : `HTTP ${authenticationResponse.status}`;
         setError(errorMessage);
-        console.log('here 1');
         return false;
       }
-      console.log('here 2');
-      console.log('authdata', authenticationData);
+
       // Step 2: Get credential with browser autofill support
       const credentialForServer = await startAuthentication({
         optionsJSON: authenticationData,
         useBrowserAutofill: false, // ← CRITICAL: Enable conditional UI
       });
 
-      console.log('here 3');
-
       // Step 3: Complete authentication
       const result = await authService.completeWebAuthnAuthentication(
         hashTag,
         credentialForServer
       );
-
-      console.log('here 4', result);
 
       if (!result.access_token) {
         setAuthError('No access token received');
