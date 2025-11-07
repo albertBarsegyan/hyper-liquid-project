@@ -4,7 +4,6 @@ import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link, useNavigate as useNav, useSearchParams } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import { Carousel } from '@/components/ui/carousel';
-import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
 
@@ -33,9 +32,7 @@ const SignUpPage: React.FC = () => {
 
   const carouselImages = [bg1, bg2, bg3, bg4];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     const cleanedTag = hashTag.trim();
     if (!cleanedTag) {
       showAlert({ variant: 'error', message: 'Tag name is required' });
@@ -149,9 +146,9 @@ const SignUpPage: React.FC = () => {
                 />
               </div>
 
-              <Button
+              <button
                 type="button"
-                onClick={handleSubmit}
+                onKeyDown={handleSubmit}
                 disabled={isDisabled}
                 className="h-12 text-responsive-base w-full"
                 style={{
@@ -161,7 +158,7 @@ const SignUpPage: React.FC = () => {
                 }}
               >
                 {isConnecting ? 'Creating...' : 'Sign up'}
-              </Button>
+              </button>
             </div>
             <div className="flex items-center  justify-center">
               <p>

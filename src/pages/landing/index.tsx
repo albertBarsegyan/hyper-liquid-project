@@ -11,7 +11,6 @@ import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
 import bg4 from '@/assets/images/bg-5.jpg';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
-import { Button } from '@/components/ui/button.tsx';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
 import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
 
@@ -136,8 +135,8 @@ const LandingPage: React.FC = () => {
                   }}
                 />
 
-                <Button
-                  onClick={handleSignIn}
+                <button
+                  onKeyDown={handleSignIn}
                   disabled={isDisabled}
                   className="h-12 text-responsive-base w-full"
                   style={{
@@ -147,7 +146,7 @@ const LandingPage: React.FC = () => {
                   }}
                 >
                   {isConnecting ? 'Signing in...' : 'Sign In'}
-                </Button>
+                </button>
               </div>
             </div>
             <div className="flex items-center  justify-center">
