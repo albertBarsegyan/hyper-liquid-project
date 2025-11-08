@@ -33,7 +33,7 @@ const LandingPage: React.FC = () => {
     }
 
     const success = await signIn({
-      hashTag: hashTag,
+      hashTag,
       referrer: referredAddress,
     });
 
@@ -123,6 +123,12 @@ const LandingPage: React.FC = () => {
                   disabled={isConnecting}
                   autoFocus
                   onChange={e => setHashTag(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      void handleSignIn();
+                    }
+                  }}
                   placeholder="Your hashtag"
                   className="w-full px-4 py-3 rounded-lg border"
                   style={{
@@ -130,14 +136,12 @@ const LandingPage: React.FC = () => {
                     borderColor: '#97fce4',
                     color: '#97fce4',
                   }}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') void handleSignIn();
-                  }}
                 />
 
-                <button
-                  onKeyDown={handleSignIn}
-                  disabled={isDisabled}
+                <div
+                  onClick={() => {
+                    if (!isDisabled) void handleSignIn();
+                  }}
                   className="h-12 text-responsive-base w-full"
                   style={{
                     backgroundColor: '#97fce4',
@@ -146,7 +150,7 @@ const LandingPage: React.FC = () => {
                   }}
                 >
                   {isConnecting ? 'Signing in...' : 'Sign In'}
-                </button>
+                </div>
               </div>
             </div>
             <div className="flex items-center  justify-center">

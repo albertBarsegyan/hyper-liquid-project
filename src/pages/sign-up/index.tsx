@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link, useNavigate as useNav, useSearchParams } from 'react-router-dom';
@@ -32,7 +32,13 @@ const SignUpPage: React.FC = () => {
 
   const carouselImages = [bg1, bg2, bg3, bg4];
 
-  const handleSubmit = async () => {
+  const signUpButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const isDisabled = !hashTag.trim() || isConnecting;
+
+  const handleNativeSubmit = useCallback(async () => {
+    if (isConnecting) return;
+
     const cleanedTag = hashTag.trim();
     if (!cleanedTag) {
       showAlert({ variant: 'error', message: 'Tag name is required' });
@@ -53,7 +59,15 @@ const SignUpPage: React.FC = () => {
         message: 'Registration failed. Please try again.',
       });
     }
-  };
+  }, [
+    error,
+    hashTag,
+    isConnecting,
+    navigate,
+    referredAddress,
+    showAlert,
+    signUp,
+  ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const filtered = allowAlphaNumUnderscore(e.target.value);
@@ -66,7 +80,20 @@ const SignUpPage: React.FC = () => {
     showAlert({ variant: 'error', message: error });
   }, [error, showAlert]);
 
-  const isDisabled = !hashTag.trim() || isConnecting;
+  useEffect(() => {
+    const buttonEl = signUpButtonRef.current;
+    if (!buttonEl) return;
+
+    const handleClick = () => {
+      void handleNativeSubmit();
+    };
+
+    buttonEl.addEventListener('click', handleClick);
+
+    return () => {
+      buttonEl.removeEventListener('click', handleClick);
+    };
+  }, [handleNativeSubmit]);
 
   return (
     <div
@@ -135,6 +162,12 @@ const SignUpPage: React.FC = () => {
                   onChange={handleChange}
                   disabled={isConnecting}
                   autoComplete="username webauthn"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      signUpButtonRef.current?.click();
+                    }
+                  }}
                   placeholder="hashtag"
                   className="flex-1 px-4 py-3 rounded-lg border"
                   style={{
@@ -148,7 +181,7 @@ const SignUpPage: React.FC = () => {
 
               <button
                 type="button"
-                onKeyDown={handleSubmit}
+                ref={signUpButtonRef}
                 disabled={isDisabled}
                 className="h-12 text-responsive-base w-full"
                 style={{
