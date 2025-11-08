@@ -90,199 +90,199 @@ export const useWallet = (): WalletContextType => {
     setAuthError(errorMessage ?? responseMessage.WENT_WRONG);
   }, []);
 
-  const signUp = async ({
-    hashTag,
-    referrer,
-  }: SignUpParams): Promise<boolean> => {
-    if (!hashTag.trim()) {
-      setAuthError('Tag name is required');
-      return false;
-    }
-
-    if (hasConnectedOnceRef.current) {
-      return false;
-    }
-
-    setIsConnecting(true);
-    authInProgressRef.current = true;
-
-    try {
-      // Step 1: Start WebAuthn registration using native fetch for Safari compatibility
-      // CRITICAL: Only ONE async operation (this fetch) is allowed before startRegistration
-      // See: https://github.com/MasterKale/SimpleWebAuthn/discussions/433
-      const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
-      const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const registrationResponse = await fetch(
-        `${APP_BASE_URL}/auth/webauthn/register/start`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            tagName: hashTag,
-            referredByTagName: referrer,
-          }),
-        }
-      );
-
-      // Parse JSON only once to avoid multiple async operations
-      const registrationData = (await registrationResponse.json()) as
-        | {
-            options: PublicKeyCredentialCreationOptionsJSON;
-            userId: number;
-          }
-        | { message: string };
-
-      // Check for errors after parsing
-      if (!registrationResponse.ok || 'message' in registrationData) {
-        const errorMessage =
-          'message' in registrationData
-            ? registrationData.message
-            : `HTTP ${registrationResponse.status}`;
-        setError(errorMessage);
+  const signUp = useCallback(
+    async ({ hashTag, referrer }: SignUpParams): Promise<boolean> => {
+      if (!hashTag.trim()) {
+        setAuthError('Tag name is required');
         return false;
       }
 
-      // Step 2: Create credential with authenticator using SimpleWebAuthn
-      // This must happen immediately after the single async fetch operation
-      const credentialForServer = await startRegistration({
-        optionsJSON: registrationData.options,
-        useAutoRegister: true,
-      });
+      if (hasConnectedOnceRef.current) {
+        return false;
+      }
 
-      // Step 3: Complete registration
-      // After startRegistration, we can make additional async calls
-      const result: WebAuthnRegistrationResponse =
-        await authService.completeWebAuthnRegistration(
-          registrationData.userId,
+      setIsConnecting(true);
+      authInProgressRef.current = true;
+
+      try {
+        // Step 1: Start WebAuthn registration using native fetch for Safari compatibility
+        // CRITICAL: Only ONE async operation (this fetch) is allowed before startRegistration
+        // See: https://github.com/MasterKale/SimpleWebAuthn/discussions/433
+        const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+        const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const registrationResponse = await fetch(
+          `${APP_BASE_URL}/auth/webauthn/register/start`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              tagName: hashTag,
+              referredByTagName: referrer,
+            }),
+          }
+        );
+
+        // Parse JSON only once to avoid multiple async operations
+        const registrationData = (await registrationResponse.json()) as
+          | {
+              options: PublicKeyCredentialCreationOptionsJSON;
+              userId: number;
+            }
+          | { message: string };
+
+        // Check for errors after parsing
+        if (!registrationResponse.ok || 'message' in registrationData) {
+          const errorMessage =
+            'message' in registrationData
+              ? registrationData.message
+              : `HTTP ${registrationResponse.status}`;
+          setError(errorMessage);
+          return false;
+        }
+
+        // Step 2: Create credential with authenticator using SimpleWebAuthn
+        // This must happen immediately after the single async fetch operation
+        const credentialForServer = await startRegistration({
+          optionsJSON: registrationData.options,
+          useAutoRegister: true,
+        });
+
+        // Step 3: Complete registration
+        // After startRegistration, we can make additional async calls
+        const result: WebAuthnRegistrationResponse =
+          await authService.completeWebAuthnRegistration(
+            registrationData.userId,
+            credentialForServer
+          );
+
+        if (result.access_token) {
+          localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
+        }
+
+        // Step 4: Get profile
+        const profile = await authService.getProfile();
+
+        if (!profile) {
+          setAuthError('Failed to fetch user profile');
+          return false;
+        }
+
+        hasConnectedOnceRef.current = true;
+        setAuthUser(profile);
+        setError('');
+
+        return true;
+      } catch (error) {
+        // Clean up any partial authentication state
+        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+
+        if (isMountedRef.current) {
+          setError(getErrorMessage(error));
+          hasConnectedOnceRef.current = false;
+        }
+
+        return false;
+      } finally {
+        if (isMountedRef.current) setIsConnecting(false);
+        authInProgressRef.current = false;
+      }
+    },
+    [setError]
+  );
+
+  const signIn = useCallback(
+    async ({ referrer, hashTag }: SignInParams): Promise<boolean> => {
+      setIsConnecting(true);
+      authInProgressRef.current = true;
+
+      try {
+        // Step 1: Start WebAuthn authentication
+        const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+        const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const authenticationResponse = await fetch(
+          `${APP_BASE_URL}/auth/webauthn/login/start`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ referrer, hashTag }),
+          }
+        );
+
+        const authenticationData = (await authenticationResponse.json()) as
+          | PublicKeyCredentialRequestOptionsJSON
+          | { message: string };
+
+        if (!authenticationResponse.ok || 'message' in authenticationData) {
+          const errorMessage =
+            'message' in authenticationData
+              ? authenticationData.message
+              : `HTTP ${authenticationResponse.status}`;
+          setError(errorMessage);
+          return false;
+        }
+
+        // Step 2: Get credential with browser autofill support
+        const credentialForServer = await startAuthentication({
+          optionsJSON: authenticationData,
+          useBrowserAutofill: true,
+        });
+
+        // Step 3: Complete authentication
+        const result = await authService.completeWebAuthnAuthentication(
+          hashTag,
           credentialForServer
         );
 
-      if (result.access_token) {
-        localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
-      }
-
-      // Step 4: Get profile
-      const profile = await authService.getProfile();
-
-      if (!profile) {
-        setAuthError('Failed to fetch user profile');
-        return false;
-      }
-
-      hasConnectedOnceRef.current = true;
-      setAuthUser(profile);
-      setError('');
-
-      return true;
-    } catch (error) {
-      // Clean up any partial authentication state
-      localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-
-      if (isMountedRef.current) {
-        setError(getErrorMessage(error));
-        hasConnectedOnceRef.current = false;
-      }
-
-      return false;
-    } finally {
-      if (isMountedRef.current) setIsConnecting(false);
-      authInProgressRef.current = false;
-    }
-  };
-
-  const signIn = async ({
-    referrer,
-    hashTag,
-  }: SignInParams): Promise<boolean> => {
-    setIsConnecting(true);
-    authInProgressRef.current = true;
-
-    try {
-      // Step 1: Start WebAuthn authentication
-      const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
-      const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const authenticationResponse = await fetch(
-        `${APP_BASE_URL}/auth/webauthn/login/start`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ referrer, hashTag }),
+        if (!result.access_token) {
+          setAuthError('No access token received');
+          return false;
         }
-      );
 
-      const authenticationData = (await authenticationResponse.json()) as
-        | PublicKeyCredentialRequestOptionsJSON
-        | { message: string };
+        localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
 
-      if (!authenticationResponse.ok || 'message' in authenticationData) {
-        const errorMessage =
-          'message' in authenticationData
-            ? authenticationData.message
-            : `HTTP ${authenticationResponse.status}`;
-        setError(errorMessage);
+        // Step 4: Get profile
+        const profile = await authService.getProfile();
+
+        if (!profile) {
+          setAuthError('Failed to fetch user profile');
+          return false;
+        }
+
+        hasConnectedOnceRef.current = true;
+        setAuthUser(profile);
+        setError('');
+
+        return true;
+      } catch (error) {
+        console.log('WebAuthn error:', error);
+
+        setError(getErrorMessage(error));
+
+        // Clean up any partial authentication state
+        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+        hasConnectedOnceRef.current = false;
         return false;
+      } finally {
+        if (isMountedRef.current) setIsConnecting(false);
+        authInProgressRef.current = false;
       }
-
-      // Step 2: Get credential with browser autofill support
-      const credentialForServer = await startAuthentication({
-        optionsJSON: authenticationData,
-        useBrowserAutofill: false, // ← CRITICAL: Enable conditional UI
-      });
-
-      // Step 3: Complete authentication
-      const result = await authService.completeWebAuthnAuthentication(
-        hashTag,
-        credentialForServer
-      );
-
-      if (!result.access_token) {
-        setAuthError('No access token received');
-        return false;
-      }
-
-      localStorageUtil.setItem(storageName.AUTH_TOKEN, result.access_token);
-
-      // Step 4: Get profile
-      const profile = await authService.getProfile();
-
-      if (!profile) {
-        setAuthError('Failed to fetch user profile');
-        return false;
-      }
-
-      hasConnectedOnceRef.current = true;
-      setAuthUser(profile);
-      setError('');
-
-      return true;
-    } catch (error) {
-      console.log('WebAuthn error:', error);
-
-      setError(getErrorMessage(error));
-
-      // Clean up any partial authentication state
-      localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-      hasConnectedOnceRef.current = false;
-      return false;
-    } finally {
-      if (isMountedRef.current) setIsConnecting(false);
-      authInProgressRef.current = false;
-    }
-  };
+    },
+    [setError]
+  );
 
   const disconnect = useCallback(async () => {
     try {

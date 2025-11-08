@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link, useNavigate as useNav, useSearchParams } from 'react-router-dom';
 import { innerRoutePath } from '@/modules/shared/utils/route.ts';
 import { Carousel } from '@/components/ui/carousel';
-import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
 
@@ -33,8 +32,12 @@ const SignUpPage: React.FC = () => {
 
   const carouselImages = [bg1, bg2, bg3, bg4];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const signUpButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const isDisabled = !hashTag.trim() || isConnecting;
+
+  const handleNativeSubmit = useCallback(async () => {
+    if (isConnecting) return;
 
     const cleanedTag = hashTag.trim();
     if (!cleanedTag) {
@@ -56,7 +59,15 @@ const SignUpPage: React.FC = () => {
         message: 'Registration failed. Please try again.',
       });
     }
-  };
+  }, [
+    error,
+    hashTag,
+    isConnecting,
+    navigate,
+    referredAddress,
+    showAlert,
+    signUp,
+  ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const filtered = allowAlphaNumUnderscore(e.target.value);
@@ -69,7 +80,20 @@ const SignUpPage: React.FC = () => {
     showAlert({ variant: 'error', message: error });
   }, [error, showAlert]);
 
-  const isDisabled = !hashTag.trim() || isConnecting;
+  useEffect(() => {
+    const buttonEl = signUpButtonRef.current;
+    if (!buttonEl) return;
+
+    const handleClick = () => {
+      void handleNativeSubmit();
+    };
+
+    buttonEl.addEventListener('click', handleClick);
+
+    return () => {
+      buttonEl.removeEventListener('click', handleClick);
+    };
+  }, [handleNativeSubmit]);
 
   return (
     <div
@@ -138,6 +162,12 @@ const SignUpPage: React.FC = () => {
                   onChange={handleChange}
                   disabled={isConnecting}
                   autoComplete="username webauthn"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      signUpButtonRef.current?.click();
+                    }
+                  }}
                   placeholder="hashtag"
                   className="flex-1 px-4 py-3 rounded-lg border"
                   style={{
@@ -149,9 +179,9 @@ const SignUpPage: React.FC = () => {
                 />
               </div>
 
-              <Button
+              <button
                 type="button"
-                onClick={handleSubmit}
+                ref={signUpButtonRef}
                 disabled={isDisabled}
                 className="h-12 text-responsive-base w-full"
                 style={{
@@ -161,7 +191,7 @@ const SignUpPage: React.FC = () => {
                 }}
               >
                 {isConnecting ? 'Creating...' : 'Sign up'}
-              </Button>
+              </button>
             </div>
             <div className="flex items-center  justify-center">
               <p>
