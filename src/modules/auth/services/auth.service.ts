@@ -6,7 +6,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
-} from '@simplewebauthn/browser';
+} from '@/modules/auth/utils/webauthn.ts';
 
 export interface AuthUser {
   hashTag: string;
@@ -183,7 +183,7 @@ export const authService = {
       'auth/webauthn/login/complete',
       {
         json: {
-          tagName,
+          hashTag: tagName,
           credential,
         },
       }

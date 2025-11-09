@@ -55,10 +55,7 @@ if (typeof globalThis.TextDecoder === 'undefined') {
           if (c > 191 && c < 224) {
             c = ((c & 31) << 6) | (bytes[i++] & 63);
           } else if (c > 223 && c < 240) {
-            c =
-              ((c & 15) << 12) |
-              ((bytes[i++] & 63) << 6) |
-              (bytes[i++] & 63);
+            c = ((c & 15) << 12) | ((bytes[i++] & 63) << 6) | (bytes[i++] & 63);
           } else if (c > 239 && c < 248) {
             c =
               ((c & 7) << 18) |
@@ -76,4 +73,3 @@ if (typeof globalThis.TextDecoder === 'undefined') {
     }
   };
 }
-

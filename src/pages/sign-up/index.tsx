@@ -12,6 +12,7 @@ import bg2 from '@/assets/images/bg-2.jpg';
 import bg3 from '@/assets/images/bg-3.jpg';
 import bg4 from '@/assets/images/bg-5.jpg';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
+import { Button } from '@/components/ui/button.tsx';
 
 export const allowAlphaNumUnderscore = (value: string): string => {
   // Replace any character that is NOT a-z, A-Z, 0-9, or underscore
@@ -179,11 +180,11 @@ const SignUpPage: React.FC = () => {
                 />
               </div>
 
-              <button
+              <Button
                 type="button"
                 ref={signUpButtonRef}
                 disabled={isDisabled}
-                className="h-12 text-responsive-base w-full"
+                className="h-12 text-responsive-base"
                 style={{
                   backgroundColor: '#97fce4',
                   color: '#0e1e27',
@@ -191,7 +192,7 @@ const SignUpPage: React.FC = () => {
                 }}
               >
                 {isConnecting ? 'Creating...' : 'Sign up'}
-              </button>
+              </Button>
             </div>
             <div className="flex items-center  justify-center">
               <p>

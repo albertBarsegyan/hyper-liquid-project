@@ -13,6 +13,7 @@ import bg4 from '@/assets/images/bg-5.jpg';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
 import { useAlert } from '@/modules/shared/contexts/alert-context.tsx';
+import { Button } from '@/components/ui/button.tsx';
 
 const LandingPage: React.FC = () => {
   const [hashTag, setHashTag] = React.useState('');
@@ -138,11 +139,13 @@ const LandingPage: React.FC = () => {
                   }}
                 />
 
-                <div
+                <Button
+                  type="button"
                   onClick={() => {
                     if (!isDisabled) void handleSignIn();
                   }}
-                  className="h-12 text-responsive-base w-full"
+                  disabled={isDisabled}
+                  className="h-12 text-responsive-base"
                   style={{
                     backgroundColor: '#97fce4',
                     color: '#0e1e27',
@@ -150,7 +153,7 @@ const LandingPage: React.FC = () => {
                   }}
                 >
                   {isConnecting ? 'Signing in...' : 'Sign In'}
-                </div>
+                </Button>
               </div>
             </div>
             <div className="flex items-center  justify-center">
