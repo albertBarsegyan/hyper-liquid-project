@@ -20,7 +20,7 @@ import {
   type PublicKeyCredentialRequestOptionsJSON,
   startAuthentication,
   startRegistration,
-} from '@simplewebauthn/browser';
+} from '@/modules/auth/utils/webauthn.ts';
 import { formatBalance } from '@/modules/wallet/utils/index.ts';
 
 export const useWallet = (): WalletContextType => {
@@ -241,11 +241,15 @@ export const useWallet = (): WalletContextType => {
           useBrowserAutofill: true,
         });
 
+        console.log('credentialForServer', credentialForServer);
+
         // Step 3: Complete authentication
         const result = await authService.completeWebAuthnAuthentication(
           hashTag,
           credentialForServer
         );
+
+        console.log('result', result);
 
         if (!result.access_token) {
           setAuthError('No access token received');

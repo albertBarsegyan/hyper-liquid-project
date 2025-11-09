@@ -10,27 +10,6 @@ interface WalletProviderProps {
   children: ReactNode;
 }
 
-// Get project ID from environment variables
-const PROJECT_ID = import.meta.env.VITE_APP_REOWN_PROJECT_ID as string;
-
-if (!PROJECT_ID) {
-  console.warn(
-    '⚠️ PROJECT_ID not found in environment variables. Please add VITE_PROJECT_ID to your .env file.'
-  );
-}
-
-/**
- * Initialize AppKit with optimal configuration
- *
- * Features enabled:
- * - Analytics for usage tracking
- * - Email wallet support
- * - Social login options
- * - On-ramp integration for purchasing crypto
- * - Injected wallet support (including Binance Wallet)
- * - EIP-6963 wallet detection
- */
-
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const wallet = useWallet();
 
