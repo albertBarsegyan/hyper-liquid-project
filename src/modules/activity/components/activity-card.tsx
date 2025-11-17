@@ -7,9 +7,10 @@ const ActivityAvatar = lazy(() => import('./activity-avatar'));
 
 interface ActivityCardProps {
   activity: UserReferral;
+  fieldName: 'referrerTagname' | 'referredTagname';
 }
 
-const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
+const ActivityCard: React.FC<ActivityCardProps> = ({ activity, fieldName }) => {
   const formatTimeAgo = (timestamp: string): string => {
     const now = new Date();
     const activityDate = new Date(timestamp);
@@ -34,7 +35,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
           <ActivityAvatar
             type="avatar"
             background="#3B82F6"
-            text={activity.referrer?.hashTag.charAt(0).toUpperCase()}
+            text={activity?.[fieldName].charAt(0).toUpperCase()}
             symbol={undefined}
             isReceived={false}
           />
@@ -44,9 +45,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Referrer info */}
-        <div className="text-white font-semibold">
-          #{activity?.referrer?.hashTag}
-        </div>
+        <div className="text-white font-semibold">#{activity?.[fieldName]}</div>
 
         <div className="text-gray-400 text-sm mt-1">
           {formatTimeAgo(activity.createdAt)}

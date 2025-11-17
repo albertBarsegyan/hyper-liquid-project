@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Typewriter } from '@/modules/shared/components/typewriter';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { Link, useNavigate as useNav, useSearchParams } from 'react-router-dom';
@@ -33,8 +33,6 @@ const SignUpPage: React.FC = () => {
 
   const carouselImages = [bg1, bg2, bg3, bg4];
 
-  const signUpButtonRef = useRef<HTMLButtonElement | null>(null);
-
   const isDisabled = !hashTag.trim() || isConnecting;
 
   const handleNativeSubmit = useCallback(async () => {
@@ -54,12 +52,9 @@ const SignUpPage: React.FC = () => {
     if (isSignUp) {
       showAlert({ variant: 'success', message: 'Registration successful!' });
       navigate(innerRoutePath.getMain());
-    } else if (!error) {
-      showAlert({
-        variant: 'error',
-        message: 'Registration failed. Please try again.',
-      });
     }
+
+    if (error) showAlert({ variant: 'error', message: error });
   }, [
     error,
     hashTag,
@@ -80,21 +75,6 @@ const SignUpPage: React.FC = () => {
 
     showAlert({ variant: 'error', message: error });
   }, [error, showAlert]);
-
-  useEffect(() => {
-    const buttonEl = signUpButtonRef.current;
-    if (!buttonEl) return;
-
-    const handleClick = () => {
-      void handleNativeSubmit();
-    };
-
-    buttonEl.addEventListener('click', handleClick);
-
-    return () => {
-      buttonEl.removeEventListener('click', handleClick);
-    };
-  }, [handleNativeSubmit]);
 
   return (
     <div
@@ -166,7 +146,7 @@ const SignUpPage: React.FC = () => {
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      signUpButtonRef.current?.click();
+                      void handleNativeSubmit();
                     }
                   }}
                   placeholder="hashtag"
@@ -182,7 +162,7 @@ const SignUpPage: React.FC = () => {
 
               <Button
                 type="button"
-                ref={signUpButtonRef}
+                onClick={handleNativeSubmit}
                 disabled={isDisabled}
                 className="h-12 text-responsive-base"
                 style={{

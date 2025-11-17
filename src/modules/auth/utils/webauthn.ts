@@ -207,12 +207,9 @@ export const startAuthentication = async ({
     ).mediation = 'required';
   }
 
-  console.log('credentialRequestOptions', credentialRequestOptions);
   const credential = (await navigator.credentials.get(
     credentialRequestOptions
   )) as PublicKeyCredential | null;
-
-  console.log('navigator.credentials.get', credential);
 
   if (!credential) {
     throw new Error('Credential retrieval was not completed');

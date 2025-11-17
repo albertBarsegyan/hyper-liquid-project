@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { referralService } from '@/modules/referral/services/referral.service';
 import type {
-  ReferralDepositParams,
   ReferralBalanceParams,
   ReferralBonusParams,
+  ReferralDepositParams,
 } from '@/modules/referral/types';
 
 // Query keys
@@ -22,7 +22,7 @@ export const REFERRAL_QUERY_KEYS = {
 export const useReferralHistory = () => {
   return useQuery({
     queryKey: REFERRAL_QUERY_KEYS.history,
-    queryFn: () => referralService.getReferralHistory(),
+    queryFn: referralService.getReferralHistory,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
