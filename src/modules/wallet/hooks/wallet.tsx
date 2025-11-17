@@ -22,6 +22,7 @@ import {
   startRegistration,
 } from '@/modules/auth/utils/webauthn.ts';
 import { formatBalance } from '@/modules/wallet/utils/index.ts';
+import { useModal } from '@/modules/shared/contexts/modal-context.tsx';
 
 export const useWallet = (): WalletContextType => {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
@@ -38,6 +39,8 @@ export const useWallet = (): WalletContextType => {
   const authInitializedRef = useRef(false);
   const authUserRef = useRef<AuthUser | null>(null);
   const authInProgressRef = useRef(false);
+  const hasShownSignupModalRef = useRef(false);
+  const { showModal } = useModal();
 
   useEffect(() => {
     authUserRef.current = authUser;
@@ -92,8 +95,13 @@ export const useWallet = (): WalletContextType => {
 
   const signUp = useCallback(
     async ({ hashTag, referrer }: SignUpParams): Promise<boolean> => {
-      if (!hashTag.trim()) {
+      const trimmed = hashTag.trim();
+      if (!trimmed) {
         setAuthError('Tag name is required');
+        return false;
+      }
+      if (trimmed.length < 3) {
+        setAuthError('Tag name must be at least 3 characters');
         return false;
       }
 
@@ -178,6 +186,15 @@ export const useWallet = (): WalletContextType => {
         setAuthUser(profile);
         setError('');
 
+        // Show sign-up success modal on first sign-up
+        if (!hasShownSignupModalRef.current) {
+          hasShownSignupModalRef.current = true;
+          showModal({
+            type: 'signup-success',
+            data: { amount: '5' },
+          });
+        }
+
         return true;
       } catch (error) {
         // Clean up any partial authentication state
@@ -199,6 +216,15 @@ export const useWallet = (): WalletContextType => {
 
   const signIn = useCallback(
     async ({ referrer, hashTag }: SignInParams): Promise<boolean> => {
+      const trimmed = hashTag?.trim?.() ?? '';
+      if (!trimmed) {
+        setAuthError('Tag name is required');
+        return false;
+      }
+      if (trimmed.length < 3) {
+        setAuthError('Tag name must be at least 3 characters');
+        return false;
+      }
       setIsConnecting(true);
       authInProgressRef.current = true;
 
@@ -241,15 +267,11 @@ export const useWallet = (): WalletContextType => {
           useBrowserAutofill: true,
         });
 
-        console.log('credentialForServer', credentialForServer);
-
         // Step 3: Complete authentication
         const result = await authService.completeWebAuthnAuthentication(
           hashTag,
           credentialForServer
         );
-
-        console.log('result', result);
 
         if (!result.access_token) {
           setAuthError('No access token received');
@@ -272,11 +294,8 @@ export const useWallet = (): WalletContextType => {
 
         return true;
       } catch (error) {
-        console.log('WebAuthn error:', error);
-
         setError(getErrorMessage(error));
 
-        // Clean up any partial authentication state
         localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
         hasConnectedOnceRef.current = false;
         return false;

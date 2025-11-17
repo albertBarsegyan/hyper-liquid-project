@@ -18,21 +18,18 @@ import {
 } from 'lucide-react';
 import { toQueryString } from '@/modules/shared/utils/url.ts';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
+import { formatNumber } from '@/modules/shared/utils/number.ts';
 
 const generateReferralCode = (tagName: string): string => {
   return window.location.origin + toQueryString({ referred: tagName });
 };
 
 const DashboardPage: React.FC = () => {
-  const {
-    isConnected,
-    balanceState,
-    isCorrectNetwork,
-    error,
-    clearError,
-    disconnect,
-  } = useWalletContext();
+  const { isConnected, isCorrectNetwork, error, clearError, disconnect } =
+    useWalletContext();
   const { authUser } = useWalletContext();
+
+  const token = authUser?.coins[0];
 
   // Address formatting removed to avoid exposing wallet address
 
@@ -274,7 +271,7 @@ const DashboardPage: React.FC = () => {
                   className="text-4xl font-bold mb-2"
                   style={{ color: '#97fce4' }}
                 >
-                  {balanceState?.balance ?? '0'} {balanceState?.symbol ?? 'BNB'}
+                  {formatNumber(token?.amount) ?? '0'} {token?.name}
                 </div>
                 <p style={{ color: '#97fce4', opacity: 0.8 }}>
                   Available Balance

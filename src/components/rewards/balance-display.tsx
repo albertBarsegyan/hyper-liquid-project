@@ -3,16 +3,15 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import React from 'react';
 import type { Reward } from '@/pages/rewards';
+import { formatNumber } from '@/modules/shared/utils/number.ts';
 
 interface BalanceDisplayProps {
-  balanceState: { balance: string; symbol: string } | null;
-  currency: string;
+  token?: { name: string; amount: string; value: string };
   achievements: Array<Reward>;
 }
 
 const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
-  balanceState,
-  currency,
+  token,
   achievements,
 }) => {
   return (
@@ -31,7 +30,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
                 className="text-responsive-sm mb-2"
                 style={{ color: '#97fce4', opacity: 0.8 }}
               >
-                Your {currency} Balance
+                Your Balance
               </p>
               <div className="flex items-center space-x-3">
                 <div
@@ -45,8 +44,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
                     className="text-responsive-2xl font-bold"
                     style={{ color: '#97fce4' }}
                   >
-                    {Number(balanceState?.balance ?? 0).toLocaleString()}{' '}
-                    {balanceState?.symbol}
+                    {formatNumber(token?.amount ?? '0')} {token?.name}
                   </p>
                 </div>
               </div>

@@ -12,6 +12,7 @@ export interface AuthUser {
   hashTag: string;
   walletAddress: string;
   points: number;
+  coins: { name: string; value: string; amount: string }[];
 }
 
 export interface WebAuthnRegistrationResponse {
@@ -39,17 +40,6 @@ export interface UserReferral {
   referrerTagname: string; // Referrer's unique tag name (referral code)
   referredTagname: string; // Referred user's tag name at the time
   createdAt: string; // ISO string
-  referrer?: UserReferralDetails; // Optional detailed referrer info
-  referredUser?: UserReferralDetails; // Optional detailed referred user info
-}
-
-interface UserReferralDetails {
-  id: string;
-  hashTag: string;
-  walletAddress: string;
-  points: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export const authService = {
@@ -95,7 +85,7 @@ export const authService = {
   getToken: (): string | null => localStorage.getItem(storageName.AUTH_TOKEN),
 
   getProfile: async (): Promise<AuthUser> => {
-    const response = await mainApiInstance.get('auth/profile');
+    const response = await mainApiInstance.get('users/profile');
     return response.json();
   },
 
@@ -184,7 +174,7 @@ export const authService = {
       {
         json: {
           hashTag: tagName,
-          credential,
+          auth: credential,
         },
       }
     );

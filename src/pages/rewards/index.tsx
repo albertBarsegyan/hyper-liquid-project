@@ -90,10 +90,12 @@ const tasks: Task[] = [
 ];
 
 const RewardsPage: React.FC = () => {
-  const { balanceState } = useWalletContext();
+  const { authUser } = useWalletContext();
   const { data } = useAuthReferrals();
 
   const totalReferrals = data?.totalReferrals ?? 0;
+
+  const token = authUser?.coins[0];
 
   const achievements: Reward[] = [
     {
@@ -105,7 +107,7 @@ const RewardsPage: React.FC = () => {
     },
     {
       id: 'balance',
-      title: 'Make balance 8,888 (Coming soon)',
+      title: 'Make balance 500 DLiqd',
       amount: 5000,
       icon: Coins,
       achieved: false,
@@ -140,11 +142,7 @@ const RewardsPage: React.FC = () => {
 
         {/* Monthly Rewards Summary */}
 
-        <BalanceDisplay
-          balanceState={balanceState}
-          currency="DLIQD"
-          achievements={achievements}
-        />
+        <BalanceDisplay token={token} achievements={achievements} />
 
         {/* Tasks Section */}
         <div>

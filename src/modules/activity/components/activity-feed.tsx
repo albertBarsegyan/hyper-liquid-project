@@ -141,7 +141,10 @@ export const ActivityFeed: React.FC = () => {
                     />
                   }
                 >
-                  <ActivityCard activity={activity} />
+                  <ActivityCard
+                    fieldName="referredTagname"
+                    activity={activity}
+                  />
                 </Suspense>
               ))}
             </div>
@@ -171,7 +174,10 @@ export const ActivityFeed: React.FC = () => {
                     />
                   }
                 >
-                  <ActivityCard activity={activity} />
+                  <ActivityCard
+                    fieldName="referrerTagname"
+                    activity={activity}
+                  />
                 </Suspense>
               ))}
             </div>
