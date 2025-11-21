@@ -3,11 +3,12 @@ import { useDebounce } from '@/modules/shared/hooks/use-debounce.ts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
-import { ArrowUpRight, Loader2, Send } from 'lucide-react';
+import { AlertTriangle, ArrowUpRight, Loader2, Send } from 'lucide-react';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
 import { usersService } from '@/modules/users/services/service';
 import { useUsers } from '@/modules/users/hooks/use-users';
 import { useAlert } from '@/modules/shared/contexts/alert-context';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { authQueryKeys } from '@/modules/wallet/hooks/wallet.tsx';
@@ -207,6 +208,20 @@ const SendPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Network Warning */}
+            <Alert
+              variant="destructive"
+              className="border-red-500 bg-red-500/10"
+            >
+              <AlertTriangle className="h-4 w-4" style={{ color: '#ef4444' }} />
+              <AlertDescription style={{ color: '#ef4444' }}>
+                <strong>Warning:</strong> You can only send tokens on the BNB
+                network. If you send coins to addresses on other networks, you
+                may lose your tokens permanently. We do not have an agreement to
+                return tokens sent to incorrect networks.
+              </AlertDescription>
+            </Alert>
+
             {/* Recipient Hashtag Search */}
             <div>
               <label
