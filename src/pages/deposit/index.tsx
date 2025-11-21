@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -7,8 +7,6 @@ import {
 } from '@/components/ui/card.tsx';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import QRCode from 'qrcode';
-
-import { CHAIN_CONFIG } from '@/modules/wallet/types';
 import { Button } from '@/components/ui/button.tsx';
 
 const DepositPage: React.FC = () => {
@@ -16,10 +14,6 @@ const DepositPage: React.FC = () => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   const address = authUser?.walletAddress ?? '';
-  const networkName = useMemo(
-    () => CHAIN_CONFIG.chainName || 'BNB Network',
-    []
-  );
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -80,13 +74,13 @@ const DepositPage: React.FC = () => {
             className="text-responsive-xl"
             style={{ color: '#97fce4' }}
           >
-            Deposit on {networkName.split(' ')[0]}
+            Deposit on BNB network
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-6 max-w-xl">
             <div
-              className="p-4 rounded-lg"
+              className="p-4 pb-8 rounded-lg"
               style={{ border: '1px solid #97fce4' }}
             >
               <p className="mb-4 font-medium" style={{ color: '#97fce4' }}>
@@ -98,7 +92,10 @@ const DepositPage: React.FC = () => {
                     src={qrDataUrl}
                     alt="Wallet QR Code"
                     className="rounded"
-                    style={{ background: '#ffffff', padding: 8 }}
+                    style={{
+                      background: '#ffffff',
+                      padding: 8,
+                    }}
                   />
                 ) : (
                   <div
