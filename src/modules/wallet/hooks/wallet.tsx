@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { JsonRpcProvider } from 'ethers';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CHAIN_CONFIG,
   type SignInParams,
@@ -24,66 +25,87 @@ import {
 import { formatBalance } from '@/modules/wallet/utils/index.ts';
 import { useModal } from '@/modules/shared/contexts/modal-context.tsx';
 
+// Query keys
+
+export const authQueryKeys = {
+  auth: {
+    profile: ['auth', 'profile'] as const,
+    balance: (address?: string) => ['auth', 'balance', address] as const,
+  },
+} as const;
+
 export const useWallet = (): WalletContextType => {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [balanceState, setBalanceState] = useState<{
-    balance: string;
-    symbol: string;
-  } | null>(null);
+  const queryClient = useQueryClient();
 
   const isMountedRef = useRef(true);
   const hasConnectedOnceRef = useRef(false);
   const authInitializedRef = useRef(false);
-  const authUserRef = useRef<AuthUser | null>(null);
   const authInProgressRef = useRef(false);
   const hasShownSignupModalRef = useRef(false);
   const { showModal } = useModal();
 
-  useEffect(() => {
-    authUserRef.current = authUser;
-  }, [authUser]);
+  // Auth profile query
+  const {
+    data: authUser,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useQuery({
+    queryKey: authQueryKeys.auth.profile,
+    queryFn: async (): Promise<AuthUser | null> => {
+      const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
+      if (!token) return null;
 
-  // Fetch wallet balance when authUser wallet address is available
-  useEffect(() => {
-    const fetchBalance = async () => {
+      try {
+        const currentUser = await authService.getProfile();
+        return currentUser || null;
+      } catch (error) {
+        // Token is invalid, remove it
+        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+        throw error;
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // Don't retry on 401 (unauthorized)
+      if (error instanceof Error && error.message.includes('401')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+
+  // Balance query
+  const { data: balanceState } = useQuery({
+    queryKey: authQueryKeys.auth.balance(authUser?.walletAddress),
+    queryFn: async (): Promise<{ balance: string; symbol: string } | null> => {
       if (!authUser?.walletAddress) {
-        setBalanceState(null);
-        return;
+        return null;
       }
 
       try {
-        // Use BSC RPC endpoint from CHAIN_CONFIG
         const rpcUrl =
           CHAIN_CONFIG.rpcUrls?.[0] || 'https://bsc-dataseed.binance.org/';
         const provider = new JsonRpcProvider(rpcUrl);
 
-        // Get balance in wei (returns bigint in ethers v6)
         const balanceWei = await provider.getBalance(authUser.walletAddress);
-
-        // Format balance and get symbol
-        // formatBalance accepts string or bigint
         const formattedBalance = formatBalance(balanceWei, 18);
         const symbol = CHAIN_CONFIG.nativeCurrency?.symbol || 'BNB';
 
-        if (isMountedRef.current) {
-          setBalanceState({
-            balance: formattedBalance,
-            symbol,
-          });
-        }
+        return {
+          balance: formattedBalance,
+          symbol,
+        };
       } catch (error) {
         console.error('Failed to fetch wallet balance:', error);
-        if (isMountedRef.current) {
-          setBalanceState(null);
-        }
+        return null;
       }
-    };
-
-    void fetchBalance();
-  }, [authUser?.walletAddress]);
+    },
+    enabled: !!authUser?.walletAddress,
+    staleTime: 30 * 1000, // 30 seconds
+    refetchInterval: 60 * 1000, // Refetch every minute
+  });
 
   const clearError = useCallback(() => {
     setAuthError(null);
@@ -183,7 +205,9 @@ export const useWallet = (): WalletContextType => {
         }
 
         hasConnectedOnceRef.current = true;
-        setAuthUser(profile);
+
+        // Update React Query cache
+        queryClient.setQueryData(authQueryKeys.auth.profile, profile);
         setError('');
 
         // Show sign-up success modal on first sign-up
@@ -199,6 +223,7 @@ export const useWallet = (): WalletContextType => {
       } catch (error) {
         // Clean up any partial authentication state
         localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+        queryClient.setQueryData(authQueryKeys.auth.profile, null);
 
         if (isMountedRef.current) {
           setError(getErrorMessage(error));
@@ -211,7 +236,7 @@ export const useWallet = (): WalletContextType => {
         authInProgressRef.current = false;
       }
     },
-    [setError]
+    [setError, showModal, queryClient]
   );
 
   const signIn = useCallback(
@@ -289,7 +314,9 @@ export const useWallet = (): WalletContextType => {
         }
 
         hasConnectedOnceRef.current = true;
-        setAuthUser(profile);
+
+        // Update React Query cache
+        queryClient.setQueryData(authQueryKeys.auth.profile, profile);
         setError('');
 
         return true;
@@ -297,6 +324,7 @@ export const useWallet = (): WalletContextType => {
         setError(getErrorMessage(error));
 
         localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
+        queryClient.setQueryData(authQueryKeys.auth.profile, null);
         hasConnectedOnceRef.current = false;
         return false;
       } finally {
@@ -304,7 +332,7 @@ export const useWallet = (): WalletContextType => {
         authInProgressRef.current = false;
       }
     },
-    [setError]
+    [setError, queryClient]
   );
 
   const disconnect = useCallback(async () => {
@@ -316,16 +344,26 @@ export const useWallet = (): WalletContextType => {
       // Sign out from auth service
       authService.signOut();
 
+      // Clear React Query cache
+      queryClient.removeQueries({ queryKey: authQueryKeys.auth.profile });
+      queryClient.removeQueries({ queryKey: authQueryKeys.auth.balance() });
+
       // Clear local state
       if (isMountedRef.current) {
-        setAuthUser(null);
         clearError();
       }
     } catch (error) {
       console.error('Disconnect failed:', error);
       if (isMountedRef.current) setError(getErrorMessage(error));
     }
-  }, [clearError, setError]);
+  }, [clearError, setError, queryClient]);
+
+  // Set auth error from profile query
+  useEffect(() => {
+    if (profileError) {
+      setError(getErrorMessage(profileError));
+    }
+  }, [profileError, setError]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -334,50 +372,26 @@ export const useWallet = (): WalletContextType => {
     };
   }, []);
 
-  // Initialize auth on mount
+  // Initialize auth on mount - no longer needed as React Query handles this
   useEffect(() => {
     if (authInitializedRef.current) return;
     authInitializedRef.current = true;
 
-    const initializeAuth = async () => {
-      const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const currentUser = await authService.getProfile();
-        if (currentUser) {
-          if (currentUser && isMountedRef.current) {
-            setAuthUser(currentUser);
-          } else {
-            // Profile fetch failed, clear invalid token
-            localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-          }
-        } else {
-          // Token is invalid, remove it
-          localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-        }
-      } catch (error) {
-        console.error('Token verification failed:', error);
-        localStorageUtil.deleteItem(storageName.AUTH_TOKEN);
-      } finally {
-        if (isMountedRef.current) setLoading(false);
-      }
-    };
-
-    void initializeAuth();
+    // React Query will automatically fetch the profile on mount
+    // so we don't need the manual initialization anymore
   }, []);
+
+  // Derived loading state
+  const loading = profileLoading;
 
   return useMemo(
     (): WalletContextType => ({
       isConnected: Boolean(authUser),
       accountAddress: authUser?.walletAddress,
-      balanceState,
+      balanceState: balanceState || null,
       isCorrectNetwork: true,
       walletInfo: undefined,
-      authUser,
+      authUser: authUser || null,
       isAuthenticated: Boolean(authUser),
 
       isConnecting,
