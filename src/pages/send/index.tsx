@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { authQueryKeys } from '@/modules/wallet/hooks/wallet.tsx';
+import { useBnbPrice } from '@/modules/crypto/hooks/use-bnb-price';
 
 const SendPage: React.FC = () => {
   const { authUser } = useWalletContext();
@@ -27,6 +28,13 @@ const SendPage: React.FC = () => {
   const [amountError, setAmountError] = useState<string>('');
 
   const searchTerm = useDebounce(selectedHashTag, 300);
+
+  // Fetch BNB price
+  const {
+    data: bnbPrice,
+    isLoading: isBnbPriceLoading,
+    error: bnbPriceError,
+  } = useBnbPrice();
 
   // Fetch users using useQuery hook
   const {
@@ -170,6 +178,20 @@ const SendPage: React.FC = () => {
     label: `${coin.name} (Balance: ${coin.amount})`,
   }));
 
+  // Calculate USD equivalent for BNB
+  const usdEquivalent = useMemo(() => {
+    if (
+      !bnbPrice ||
+      !amount ||
+      !selectedCoin ||
+      selectedCoin.toLowerCase() !== 'bnb' ||
+      isNaN(parseFloat(amount))
+    ) {
+      return null;
+    }
+    return parseFloat(amount) * bnbPrice;
+  }, [bnbPrice, amount, selectedCoin]);
+
   const hasError = Boolean(amountError);
   const canSend =
     selectedHashTag &&
@@ -211,14 +233,15 @@ const SendPage: React.FC = () => {
             {/* Network Warning */}
             <Alert
               variant="destructive"
-              className="border-red-500 bg-red-500/10"
+              className="border-purple-500 bg-purple-500/10"
             >
               <AlertTriangle className="h-4 w-4" style={{ color: '#ef4444' }} />
               <AlertDescription style={{ color: '#ef4444' }}>
-                <strong>Warning:</strong> You can only send tokens on the BNB
-                network. If you send coins to addresses on other networks, you
-                may lose your tokens permanently. We do not have an agreement to
-                return tokens sent to incorrect networks.
+                <strong>Warning:</strong> You can only send tokens on the{' '}
+                <span style={{ textDecoration: 'underline' }}>BNB network</span>
+                . If you send coins to addresses on other networks, you may lose
+                your tokens permanently. We do not have an agreement to return
+                tokens sent to incorrect networks.
               </AlertDescription>
             </Alert>
 
@@ -346,6 +369,32 @@ const SendPage: React.FC = () => {
                     Available:{' '}
                     {availableCoins.find(c => c.name === selectedCoin)?.amount}{' '}
                     {selectedCoin}
+                  </p>
+                )}
+                {/* BNB to USD Conversion */}
+                {selectedCoin?.toLowerCase() === 'bnb' && bnbPrice && (
+                  <div className="mt-2 p-2 rounded border" style={{ borderColor: '#97fce4', backgroundColor: '#0e1e27' }}>
+                    <p className="text-xs mb-1" style={{ color: '#97fce4', opacity: 0.8 }}>
+                      BNB Price: ${bnbPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    {usdEquivalent !== null && (
+                      <p className="text-sm font-medium" style={{ color: '#97fce4' }}>
+                        ≈ ${usdEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                      </p>
+                    )}
+                  </div>
+                )}
+                {selectedCoin?.toLowerCase() === 'bnb' && isBnbPriceLoading && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <Loader2 className="h-3 w-3 animate-spin" style={{ color: '#97fce4' }} />
+                    <p className="text-xs" style={{ color: '#97fce4', opacity: 0.7 }}>
+                      Loading BNB price...
+                    </p>
+                  </div>
+                )}
+                {selectedCoin?.toLowerCase() === 'bnb' && bnbPriceError && (
+                  <p className="text-xs mt-2" style={{ color: '#ef4444', opacity: 0.8 }}>
+                    Failed to load BNB price
                   </p>
                 )}
               </div>

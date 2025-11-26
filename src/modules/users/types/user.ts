@@ -44,6 +44,10 @@ export interface SendCoinRequest {
   memo?: string;
 }
 
+export interface ConvertBnbDto {
+  bnbAmount: string; // BNB amount to convert (as decimal string)
+}
+
 export interface GetUsersParams {
   page?: number;
   limit?: number;

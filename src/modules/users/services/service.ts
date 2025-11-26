@@ -1,5 +1,6 @@
 import { mainApiInstance } from '@/configs/api/main-instance.ts';
 import type {
+  ConvertBnbDto,
   GetUsersParams,
   SendCoinRequest,
   UserResponseDto,
@@ -64,6 +65,27 @@ export const usersService = {
       json: data,
     });
     return response.json<{ status: string }>();
+  },
+
+  /**
+   * Convert BNB to Dliqd
+   */
+
+  convertBnb: async (
+    data: ConvertBnbDto
+  ): Promise<{
+    transactionHash: string;
+    dliqdAmount: string;
+    bnbAmount: string;
+  }> => {
+    const response = await mainApiInstance.post('coins/convert', {
+      json: data,
+    });
+    return response.json<{
+      transactionHash: string;
+      dliqdAmount: string;
+      bnbAmount: string;
+    }>();
   },
 
   /**

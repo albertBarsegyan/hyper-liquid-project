@@ -8,6 +8,8 @@ import {
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context.tsx';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button.tsx';
+import { Alert, AlertDescription } from '@/components/ui/alert.tsx';
+import { AlertTriangle } from 'lucide-react';
 
 const DepositPage: React.FC = () => {
   const { authUser, isConnected } = useWalletContext();
@@ -104,6 +106,24 @@ const DepositPage: React.FC = () => {
                   />
                 )}
               </div>
+              <Alert
+                variant="destructive"
+                className="border-purple-500 bg-purple-500/10 mt-3 lg:mt-6"
+              >
+                <AlertTriangle
+                  className="h-4 w-4"
+                  style={{ color: '#ef4444' }}
+                />
+                <AlertDescription style={{ color: '#ef4444' }}>
+                  <strong>Warning:</strong> You can only send tokens on the{' '}
+                  <span style={{ textDecoration: 'underline' }}>
+                    BNB network{' '}
+                  </span>
+                  . If you send coins to addresses on other networks, you may
+                  lose your tokens permanently. We do not have an agreement to
+                  return tokens sent to incorrect networks.
+                </AlertDescription>
+              </Alert>
             </div>
 
             <div>

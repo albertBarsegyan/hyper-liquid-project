@@ -22,13 +22,13 @@ const AuthenticatedLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen gradient-primary">
+    <div className="flex h-full gradient-primary">
       {/* Mobile Menu Button */}
       <Button
         variant="ghost"
         size="sm"
         onClick={toggleMobileMenu}
-        className="fixed top-4 right-4 z-50 lg:hidden"
+        className="fixed top-24 right-4 z-50 lg:hidden"
         style={{
           backgroundColor: '#021e17',
           border: '1px solid #97fce4',
