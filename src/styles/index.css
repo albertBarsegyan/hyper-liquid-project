@@ -151,6 +151,19 @@
         animation: border-glow 3s ease-in-out infinite;
     }
 
+    @keyframes ticker-scroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .ticker-scroll {
+        animation: ticker-scroll 30s linear infinite;
+    }
+
 
   /* Responsive text utilities */
   .text-responsive-xs {

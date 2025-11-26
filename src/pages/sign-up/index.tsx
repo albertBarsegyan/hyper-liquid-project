@@ -150,7 +150,7 @@ const SignUpPage: React.FC = () => {
                     }
                   }}
                   placeholder="hashtag"
-                  className="flex-1 px-4 py-3 rounded-lg border"
+                  className="flex-1 px-4 py-3 rounded-lg border w-full"
                   style={{
                     backgroundColor: '#021e17',
                     borderColor: '#97fce4',

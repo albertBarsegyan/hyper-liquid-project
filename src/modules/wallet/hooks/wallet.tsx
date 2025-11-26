@@ -388,10 +388,10 @@ export const useWallet = (): WalletContextType => {
     (): WalletContextType => ({
       isConnected: Boolean(authUser),
       accountAddress: authUser?.walletAddress,
-      balanceState: balanceState || null,
+      balanceState: balanceState ?? null,
       isCorrectNetwork: true,
       walletInfo: undefined,
-      authUser: authUser || null,
+      authUser: authUser ?? null,
       isAuthenticated: Boolean(authUser),
 
       isConnecting,
