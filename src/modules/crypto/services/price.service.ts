@@ -16,7 +16,7 @@ export async function fetchBnbPrice(): Promise<number> {
   const res = await fetch(
     'https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'
   );
-  const data = await res.json<BnbPriceResponse>();
-  return data.binancecoin.usd;
-}
 
+  const data = (await res.json()) as BnbPriceResponse;
+  return data.binancecoin.usd as number;
+}
