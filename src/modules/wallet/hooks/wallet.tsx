@@ -24,6 +24,8 @@ import {
 } from '@/modules/auth/utils/webauthn.ts';
 import { formatBalance } from '@/modules/wallet/utils/index.ts';
 import { useModal } from '@/modules/shared/contexts/modal-context.tsx';
+import { isLinuxUserAgent } from '@/modules/auth/utils/user-agent.ts';
+import { APP_BASE_URL } from '@/configs/api/main-instance.ts';
 
 // Query keys
 
@@ -135,10 +137,103 @@ export const useWallet = (): WalletContextType => {
       authInProgressRef.current = true;
 
       try {
-        // Step 1: Start WebAuthn registration using native fetch for Safari compatibility
-        // CRITICAL: Only ONE async operation (this fetch) is allowed before startRegistration
-        // See: https://github.com/MasterKale/SimpleWebAuthn/discussions/433
-        const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
+        // Check if user agent is Linux - use TOTP instead of WebAuthn
+        if (isLinuxUserAgent()) {
+          // Step 1: Setup TOTP (this also registers the user if they don't exist)
+          const totpSetup = await authService.setupTotp({
+            tagName: trimmed,
+            referrer,
+          });
+
+          // Step 2: Show TOTP setup modal and wait for verification
+          return new Promise<boolean>(resolve => {
+            let isResolved = false;
+
+            const handleVerify = async (code: string): Promise<boolean> => {
+              try {
+                // Step 3: Verify TOTP code (completes registration)
+                const verifyResult = await authService.verifyTotp({
+                  tagName: trimmed,
+                  code,
+                });
+
+                if (!verifyResult.access_token) {
+                  setAuthError('TOTP verification failed');
+                  if (!isResolved) {
+                    isResolved = true;
+                    resolve(false);
+                  }
+                  return false;
+                }
+
+                localStorageUtil.setItem(
+                  storageName.AUTH_TOKEN,
+                  verifyResult.access_token
+                );
+
+                // Step 4: Get profile
+                const profile = await authService.getProfile();
+
+                if (!profile) {
+                  setAuthError('Failed to fetch user profile');
+                  if (!isResolved) {
+                    isResolved = true;
+                    resolve(false);
+                  }
+                  return false;
+                }
+
+                hasConnectedOnceRef.current = true;
+
+                // Update React Query cache
+                queryClient.setQueryData(authQueryKeys.auth.profile, profile);
+                setError('');
+
+                // Show sign-up success modal on first sign-up
+                if (!hasShownSignupModalRef.current) {
+                  hasShownSignupModalRef.current = true;
+                  showModal({
+                    type: 'signup-success',
+                    data: { amount: '5' },
+                  });
+                }
+
+                if (!isResolved) {
+                  isResolved = true;
+                  resolve(true);
+                }
+                return true;
+              } catch (error) {
+                setError(getErrorMessage(error));
+                if (!isResolved) {
+                  isResolved = true;
+                  resolve(false);
+                }
+                return false;
+              }
+            };
+
+            const handleClose = () => {
+              if (!isResolved) {
+                isResolved = true;
+                setAuthError('TOTP setup cancelled');
+                resolve(false);
+              }
+            };
+
+            // Show the TOTP setup modal
+            showModal({
+              type: 'totp-setup',
+              data: {
+                qrCode: totpSetup.qrCode,
+                manualEntryKey: totpSetup.manualEntryKey,
+                onVerify: handleVerify,
+                onClose: handleClose,
+              },
+            });
+          });
+        }
+
         const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
         const headers: HeadersInit = {
           'Content-Type': 'application/json',
@@ -226,6 +321,7 @@ export const useWallet = (): WalletContextType => {
         queryClient.setQueryData(authQueryKeys.auth.profile, null);
 
         if (isMountedRef.current) {
+          console.log('getErrorMessage(error)', getErrorMessage(error));
           setError(getErrorMessage(error));
           hasConnectedOnceRef.current = false;
         }
@@ -254,6 +350,94 @@ export const useWallet = (): WalletContextType => {
       authInProgressRef.current = true;
 
       try {
+        // Check if user agent is Linux - use TOTP instead of WebAuthn
+        if (isLinuxUserAgent()) {
+          // Show TOTP code modal and wait for submission
+          return new Promise<boolean>(resolve => {
+            let isResolved = false;
+
+            const handleSubmit = async (
+              code: string
+            ): Promise<{ success?: boolean; error?: string }> => {
+              try {
+                // Authenticate with TOTP
+                const result = await authService.authenticateTotp({
+                  tagName: trimmed,
+                  code,
+                  referrer,
+                });
+
+                if (!result.access_token) {
+                  const message = 'No access token received';
+                  setAuthError(message);
+                  if (!isResolved) {
+                    isResolved = true;
+                    resolve(false);
+                  }
+                  return { error: message };
+                }
+
+                localStorageUtil.setItem(
+                  storageName.AUTH_TOKEN,
+                  result.access_token
+                );
+
+                // Get profile
+                const profile = await authService.getProfile();
+
+                if (!profile) {
+                  const message = 'Failed to fetch user profile';
+                  setAuthError(message);
+                  if (!isResolved) {
+                    isResolved = true;
+                    resolve(false);
+                  }
+                  return { error: message };
+                }
+
+                hasConnectedOnceRef.current = true;
+
+                // Update React Query cache
+                queryClient.setQueryData(authQueryKeys.auth.profile, profile);
+                setError('');
+
+                if (!isResolved) {
+                  isResolved = true;
+                  resolve(true);
+                }
+                return { success: true };
+              } catch (error) {
+                const message = getErrorMessage(error);
+                setError(message);
+                if (!isResolved) {
+                  isResolved = true;
+                  resolve(false);
+                }
+                return { error: message };
+              }
+            };
+
+            const handleClose = () => {
+              if (!isResolved) {
+                isResolved = true;
+                setAuthError('Sign in cancelled');
+                resolve(false);
+              }
+            };
+
+            // Show the TOTP code modal
+            showModal({
+              type: 'totp-code',
+              data: {
+                tagName: trimmed,
+                onSubmit: handleSubmit,
+                onClose: handleClose,
+              },
+            });
+          });
+        }
+
+        // WebAuthn flow for non-Linux user agents
         // Step 1: Start WebAuthn authentication
         const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL as string;
         const token = localStorageUtil.getItem(storageName.AUTH_TOKEN);
@@ -332,7 +516,7 @@ export const useWallet = (): WalletContextType => {
         authInProgressRef.current = false;
       }
     },
-    [setError, queryClient]
+    [queryClient, setError, showModal]
   );
 
   const disconnect = useCallback(async () => {
@@ -345,8 +529,12 @@ export const useWallet = (): WalletContextType => {
       authService.signOut();
 
       // Clear React Query cache
-      queryClient.removeQueries({ queryKey: authQueryKeys.auth.profile });
-      queryClient.removeQueries({ queryKey: authQueryKeys.auth.balance() });
+      await queryClient.invalidateQueries({
+        queryKey: authQueryKeys.auth.profile,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: authQueryKeys.auth.balance(),
+      });
 
       // Clear local state
       if (isMountedRef.current) {

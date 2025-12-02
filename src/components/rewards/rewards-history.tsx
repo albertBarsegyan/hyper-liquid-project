@@ -29,7 +29,7 @@ const RewardsHistory: React.FC<RewardsHistoryProps> = ({
         </CardTitle>
       </CardHeader>
       <div className="relative">
-        <p className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl z-10 bold">
+        <p className="absolute top-1/3 left-1/2 transform text-center -translate-x-1/2 -translate-y-1/2 text-3xl z-10 bold">
           Coming soon
         </p>
         <CardContent className="filter blur-sm">

@@ -23,4 +23,3 @@ export const useBnbPrice = (enabled: boolean = true) => {
     refetchInterval: 60000, // Refetch every minute
   });
 };
-

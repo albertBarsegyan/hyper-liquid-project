@@ -48,7 +48,7 @@ const DepositPage: React.FC = () => {
 
   if (!isConnected || !address) {
     return (
-      <div className="p-6">
+      <div className="p-2 lg:p-6">
         <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
           <CardHeader>
             <CardTitle
@@ -69,7 +69,7 @@ const DepositPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-2 lg:p-6">
       <Card style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}>
         <CardHeader>
           <CardTitle
@@ -133,10 +133,12 @@ const DepositPage: React.FC = () => {
               <Button
                 onClick={() => copyToClipboard(address)}
                 variant="link"
-                className="w-full p-4 rounded-lg text-sm break-all"
+                className="w-full p-4 rounded-lg text-sm break-all "
                 style={{ border: '1px solid #97fce4', color: '#97fce4' }}
               >
-                {address}
+                <span className="text-ellipsis overflow-hidden mx-2">
+                  {address}
+                </span>
               </Button>
             </div>
           </div>

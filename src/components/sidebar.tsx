@@ -70,27 +70,22 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const sidebarClasses = clsx('lg:translate-x-0 lg:static lg:w-64', {
-    'h-screen w-64': !isMobile,
-    'fixed top-0 left-0 z-50 h-full w-full transition-transform duration-300 ease-in-out':
-      isMobile,
-    'translate-x-0': isMobile && isOpen,
-    '-translate-x-full': isMobile && !isOpen,
-  });
-
-  const overlayClasses =
-    isMobile && isOpen
-      ? 'fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden'
-      : 'hidden';
+  const sidebarClasses = clsx(
+    'lg:translate-x-0 lg:static lg:w-64 flex flex-col gradient-card',
+    {
+      'h-screen w-64': !isMobile,
+      'fixed left-0 z-30 h-full w-full transition-transform duration-300 ease-in-out':
+        isMobile,
+      'translate-x-0': isMobile && isOpen,
+      '-translate-x-full': isMobile && !isOpen,
+    },
+    className
+  );
 
   return (
     <>
-      {isMobile && <div className={overlayClasses} onClick={onClose} />}
-
       {/* Sidebar */}
-      <div
-        className={`${sidebarClasses} flex flex-col gradient-card ${className}`}
-      >
+      <div className={sidebarClasses} onClick={onClose}>
         {/* Header */}
         <div
           className="p-4 sm:p-6 border-b flex items-center justify-between"

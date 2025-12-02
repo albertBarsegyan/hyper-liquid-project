@@ -8,7 +8,11 @@ import {
 } from 'react';
 import { ModalRenderer } from '@/components/modals/modal-renderer.tsx';
 
-export type ModalType = 'signup-success' | 'custom';
+export type ModalType =
+  | 'signup-success'
+  | 'totp-setup'
+  | 'totp-code'
+  | 'custom';
 
 interface ShowModalParams {
   type: ModalType;

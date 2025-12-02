@@ -28,7 +28,7 @@ const AuthenticatedLayout: React.FC = () => {
         variant="ghost"
         size="sm"
         onClick={toggleMobileMenu}
-        className="fixed top-24 right-4 z-50 lg:hidden"
+        className="fixed top-12 right-6 z-30 lg:hidden"
         style={{
           backgroundColor: '#021e17',
           border: '1px solid #97fce4',

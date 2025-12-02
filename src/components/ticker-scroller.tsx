@@ -1,24 +1,33 @@
 import React from 'react';
+import type { AuthUser } from '@/modules/auth/services/auth.service.ts';
+import { clsx } from 'clsx';
 
 interface TickerScrollerProps {
   messages?: string[];
   height?: number;
+  authUser?: AuthUser | null;
 }
 
+const messagesList = [
+  'Dliqd coin presales 50% cheaper',
+  'Limited time offer - Get started today!',
+  'Join thousands of users already earning',
+];
+
 const TickerScroller: React.FC<TickerScrollerProps> = ({
-  messages = [
-    'Dliqd coin presales 50% cheaper',
-    'Limited time offer - Get started today!',
-    'Join thousands of users already earning',
-  ],
+  messages = messagesList,
   height = 30,
+  authUser,
 }) => {
   // Duplicate messages for seamless loop
   const duplicatedMessages = [...messages, ...messages];
 
   return (
     <div
-      className="relative w-full overflow-hidden ticker-container"
+      className={clsx(
+        'fixed lg:relative z-30 w-full overflow-hidden ticker-container',
+        { ['hidden']: Boolean(authUser) }
+      )}
       style={{
         height: `${height}px`,
         backgroundColor: '#208c71',

@@ -42,6 +42,20 @@ export interface UserReferral {
   createdAt: string; // ISO string
 }
 
+export interface TotpSetupResponse {
+  secret: string;
+  qrCode: string;
+  manualEntryKey: string;
+}
+
+export interface TotpVerifyResponse {
+  access_token: string;
+}
+
+export interface TotpAuthenticateResponse {
+  access_token: string;
+}
+
 export const authService = {
   requestNonce: async (address: string): Promise<string> => {
     const response = await mainApiInstance.get('auth/nonce', {
@@ -179,5 +193,65 @@ export const authService = {
       }
     );
     return response.json<WebAuthnAuthenticationResponse>();
+  },
+
+  /**
+   * Setup TOTP for a user (also registers the user if they don't exist)
+   */
+  setupTotp: async ({
+    tagName,
+    referrer,
+  }: {
+    tagName: string;
+    referrer?: string;
+  }): Promise<TotpSetupResponse> => {
+    const response = await mainApiInstance.post('auth/totp/setup', {
+      json: {
+        tagName,
+        ...(referrer && { referrer }),
+      },
+    });
+    return response.json<TotpSetupResponse>();
+  },
+
+  /**
+   * Verify TOTP code during setup
+   */
+  verifyTotp: async ({
+    tagName,
+    code,
+  }: {
+    tagName: string;
+    code: string;
+  }): Promise<TotpVerifyResponse> => {
+    const response = await mainApiInstance.post('auth/totp/verify', {
+      json: {
+        tagName,
+        code,
+      },
+    });
+    return response.json<TotpVerifyResponse>();
+  },
+
+  /**
+   * Authenticate with TOTP
+   */
+  authenticateTotp: async ({
+    tagName,
+    code,
+    referrer,
+  }: {
+    tagName: string;
+    code: string;
+    referrer?: string;
+  }): Promise<TotpAuthenticateResponse> => {
+    const response = await mainApiInstance.post('auth/totp/authenticate', {
+      json: {
+        tagName,
+        code,
+        referrer,
+      },
+    });
+    return response.json<TotpAuthenticateResponse>();
   },
 };

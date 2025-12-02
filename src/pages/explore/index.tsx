@@ -148,7 +148,7 @@ const ExplorePage: React.FC = () => {
                 key={item}
                 style={{ backgroundColor: '#021e17', borderColor: '#97fce4' }}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-2 lg:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div

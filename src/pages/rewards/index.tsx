@@ -99,13 +99,6 @@ const RewardsPage: React.FC = () => {
 
   const achievements: Reward[] = [
     {
-      id: 'sendtag',
-      title: 'Deposit 10$ (Coming soon)',
-      amount: 1000,
-      icon: Star,
-      achieved: false,
-    },
-    {
       id: 'balance',
       title: 'Make balance 500 DLiqd',
       amount: 5000,
@@ -153,7 +146,7 @@ const RewardsPage: React.FC = () => {
             Tasks
           </h2>
           <div className="relative">
-            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl z-10 bold">
+            <p className="absolute top-1/2 left-1/2 transform text-center -translate-x-1/2 -translate-y-1/2 text-3xl z-10 bold">
               Coming soon
             </p>
 

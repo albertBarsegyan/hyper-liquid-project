@@ -373,27 +373,57 @@ const SendPage: React.FC = () => {
                 )}
                 {/* BNB to USD Conversion */}
                 {selectedCoin?.toLowerCase() === 'bnb' && bnbPrice && (
-                  <div className="mt-2 p-2 rounded border" style={{ borderColor: '#97fce4', backgroundColor: '#0e1e27' }}>
-                    <p className="text-xs mb-1" style={{ color: '#97fce4', opacity: 0.8 }}>
-                      BNB Price: ${bnbPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <div
+                    className="mt-2 p-2 rounded border"
+                    style={{
+                      borderColor: '#97fce4',
+                      backgroundColor: '#0e1e27',
+                    }}
+                  >
+                    <p
+                      className="text-xs mb-1"
+                      style={{ color: '#97fce4', opacity: 0.8 }}
+                    >
+                      BNB Price: $
+                      {bnbPrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </p>
                     {usdEquivalent !== null && (
-                      <p className="text-sm font-medium" style={{ color: '#97fce4' }}>
-                        ≈ ${usdEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: '#97fce4' }}
+                      >
+                        ≈ $
+                        {usdEquivalent.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{' '}
+                        USD
                       </p>
                     )}
                   </div>
                 )}
                 {selectedCoin?.toLowerCase() === 'bnb' && isBnbPriceLoading && (
                   <div className="mt-2 flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 animate-spin" style={{ color: '#97fce4' }} />
-                    <p className="text-xs" style={{ color: '#97fce4', opacity: 0.7 }}>
+                    <Loader2
+                      className="h-3 w-3 animate-spin"
+                      style={{ color: '#97fce4' }}
+                    />
+                    <p
+                      className="text-xs"
+                      style={{ color: '#97fce4', opacity: 0.7 }}
+                    >
                       Loading BNB price...
                     </p>
                   </div>
                 )}
                 {selectedCoin?.toLowerCase() === 'bnb' && bnbPriceError && (
-                  <p className="text-xs mt-2" style={{ color: '#ef4444', opacity: 0.8 }}>
+                  <p
+                    className="text-xs mt-2"
+                    style={{ color: '#ef4444', opacity: 0.8 }}
+                  >
                     Failed to load BNB price
                   </p>
                 )}
