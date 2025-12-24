@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { innerRoutePath } from '@/modules/shared/utils/route';
 import { useWalletContext } from '@/modules/wallet/hooks/wallet-context';
-import { Activity, Download, Home, Send, Trophy, User, X } from 'lucide-react';
+import { Activity, Download, Home, Send, Trophy, TrendingUp, User, X } from 'lucide-react';
 import { BrandIcon } from '@/modules/shared/components/icons/brand.tsx';
 import { clsx } from 'clsx';
 
@@ -38,7 +38,12 @@ const navigationItems = [
     icon: Send,
     path: innerRoutePath.getTransactions(),
   },
-
+  {
+    id: 'trading',
+    label: 'Trading',
+    icon: TrendingUp,
+    path: innerRoutePath.getTrading(),
+  },
   {
     id: 'activity',
     label: 'Activity',

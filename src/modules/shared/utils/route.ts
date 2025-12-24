@@ -11,6 +11,7 @@ export const innerRoutePath = {
   getDeposit: () => '/deposit',
   getExplore: () => '/explore',
   getRewards: () => '/rewards',
+  getTrading: () => '/trading',
   getAdditionalInfo: () => '/additional-info',
   getProfileSettings: () => '/profile-settings',
   getForgetPassword: () => '/forget-password',

@@ -27,8 +27,6 @@ import { useModal } from '@/modules/shared/contexts/modal-context.tsx';
 import { isLinuxUserAgent } from '@/modules/auth/utils/user-agent.ts';
 import { APP_BASE_URL } from '@/configs/api/main-instance.ts';
 
-// Query keys
-
 export const authQueryKeys = {
   auth: {
     profile: ['auth', 'profile'] as const,
